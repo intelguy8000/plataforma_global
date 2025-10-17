@@ -1,4 +1,4 @@
-// Historical data for 24 months (Nov 2022 - Oct 2024)
+// Historical data for 24 months (Nov 2023 - Oct 2025)
 // Realistic scale for education consulting business
 
 import { addMonths, format, startOfMonth } from 'date-fns';
@@ -35,33 +35,33 @@ export interface MonthlyMetrics {
 
 // Seasonal multipliers based on Colombian education market
 const SEASONAL_MULTIPLIERS: Record<string, { leads: number; conversion: number; revenue: number }> = {
-  // Q4 2022
+  // Q4 (Nov-Dec)
   nov: { leads: 1.0, conversion: 0.85, revenue: 0.90 },
   dec: { leads: 0.5, conversion: 0.70, revenue: 0.65 },
 
-  // Q1 2023 - HIGH SEASON (New Year enrollments)
+  // Q1 - HIGH SEASON (New Year enrollments)
   jan: { leads: 1.6, conversion: 1.15, revenue: 1.25 },
   feb: { leads: 1.8, conversion: 1.20, revenue: 1.30 },
   mar: { leads: 1.5, conversion: 1.10, revenue: 1.20 },
 
-  // Q2 2023
+  // Q2
   apr: { leads: 0.7, conversion: 0.90, revenue: 0.85 },
   may: { leads: 1.1, conversion: 1.00, revenue: 1.05 },
   jun: { leads: 1.3, conversion: 1.05, revenue: 1.10 },
 
-  // Q3 2023 - MID SEASON (Summer programs)
+  // Q3 - MID SEASON (Summer programs)
   jul: { leads: 1.4, conversion: 1.10, revenue: 1.15 },
   aug: { leads: 1.3, conversion: 1.08, revenue: 1.12 },
   sep: { leads: 1.0, conversion: 0.95, revenue: 1.00 },
 
-  // Q4 2023
+  // Q4
   oct: { leads: 1.1, conversion: 1.00, revenue: 1.05 },
 };
 
 // Growth model: 20% annual growth compounded
 const ANNUAL_GROWTH_RATE = 1.20;
 
-// Base numbers (November 2022)
+// Base numbers (November 2023)
 const BASE_MONTHLY_LEADS = 420;
 const BASE_CONVERSION_RATE = 0.10;  // 10%
 const BASE_AVG_COMMISSION = 3_200_000;  // 3.2M COP per student
@@ -71,10 +71,10 @@ function randomVariance(variance: number = 0.08): number {
   return 1 + (Math.random() - 0.5) * 2 * variance;
 }
 
-// Generate 24 months of historical data (Nov 2022 - Oct 2024)
+// Generate 24 months of historical data (Nov 2023 - Oct 2025)
 export function generateHistoricalData(): MonthlyMetrics[] {
-  const startDate = new Date('2022-11-01');
-  const endDate = new Date('2024-10-31');
+  const startDate = new Date('2023-11-01');
+  const endDate = new Date('2025-10-31');
   const metrics: MonthlyMetrics[] = [];
 
   let currentDate = startOfMonth(startDate);
@@ -192,19 +192,19 @@ export function getCurrentMonthData(): MonthlyMetrics {
 }
 
 // Get YoY comparison
-export function getYoYComparison(): { month: string; year2023: number; year2024: number }[] {
+export function getYoYComparison(): { month: string; year2024: number; year2025: number }[] {
   const allData = getHistoricalData();
-  const comparison: { month: string; year2023: number; year2024: number }[] = [];
+  const comparison: { month: string; year2024: number; year2025: number }[] = [];
 
   for (let month = 0; month < 12; month++) {
-    const data2023 = allData.find(m => m.year === 2023 && m.month === month);
     const data2024 = allData.find(m => m.year === 2024 && m.month === month);
+    const data2025 = allData.find(m => m.year === 2025 && m.month === month);
 
-    if (data2023 || data2024) {
+    if (data2024 || data2025) {
       comparison.push({
-        month: data2023?.monthName || data2024?.monthName || '',
-        year2023: data2023?.revenue || 0,
-        year2024: data2024?.revenue || 0
+        month: data2024?.monthName || data2025?.monthName || '',
+        year2024: data2024?.revenue || 0,
+        year2025: data2025?.revenue || 0
       });
     }
   }

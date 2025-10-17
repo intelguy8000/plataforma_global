@@ -32,8 +32,8 @@ export default function OverviewPage() {
   // Format YoY comparison data for chart
   const yoyChartData = yoyData.map(item => ({
     month: item.month.substring(0, 3), // First 3 letters (Ene, Feb, etc)
-    '2023': item.year2023 / 1000000, // Convert to millions
-    '2024': item.year2024 / 1000000
+    '2024': item.year2024 / 1000000, // Convert to millions
+    '2025': item.year2025 / 1000000
   }));
 
   // Format data for pipeline funnel
@@ -92,7 +92,7 @@ export default function OverviewPage() {
       <Card>
         <CardHeader>
           <CardTitle>Comparación Año a Año (YoY)</CardTitle>
-          <CardDescription>Revenue mensual 2023 vs 2024 - Millones COP</CardDescription>
+          <CardDescription>Revenue mensual 2024 vs 2025 - Millones COP</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={350}>
@@ -118,16 +118,16 @@ export default function OverviewPage() {
                 iconType="rect"
               />
               <Bar
-                dataKey="2023"
+                dataKey="2024"
                 fill="#94A3B8"
                 radius={[4, 4, 0, 0]}
-                name="2023"
+                name="2024"
               />
               <Bar
-                dataKey="2024"
+                dataKey="2025"
                 fill="#10B981"
                 radius={[4, 4, 0, 0]}
-                name="2024"
+                name="2025"
               />
             </BarChart>
           </ResponsiveContainer>
