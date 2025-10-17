@@ -7,30 +7,47 @@ export function cn(...inputs: ClassValue[]) {
 
 // Format currency in COP (Colombian Pesos)
 export function formatCOP(amount: number): string {
-  // For millions, show as "X,XM" or "XM" (no decimal if .0)
-  if (amount >= 1000000) {
-    const millions = amount / 1000000;
-    const decimal = millions % 1;
+  // For billions (mil millones), show as "X.XB" or "XB" (no decimal if .0)
+  if (amount >= 1000000000) {
+    const billions = amount / 1000000000;
+    const roundedBillions = Math.round(billions * 10) / 10; // Round to 1 decimal
+    const decimal = roundedBillions % 1;
 
     // Si el decimal es 0, no mostrarlo
     if (decimal === 0) {
-      return `$${Math.floor(millions)}M`;
+      return `$${Math.floor(roundedBillions)}B`;
     }
 
-    // Si tiene decimal, mostrar con coma (formato colombiano)
-    return `$${millions.toFixed(1).replace('.', ',')}M`;
+    // Si tiene decimal, mostrar con punto (formato colombiano para COP)
+    return `$${roundedBillions.toFixed(1)}B`;
   }
 
-  // For thousands, show as "X,XK" or "XK" (no decimal if .0)
-  if (amount >= 1000) {
-    const thousands = amount / 1000;
-    const decimal = thousands % 1;
+  // For millions, show as "X.XM" or "XM" (no decimal if .0)
+  if (amount >= 1000000) {
+    const millions = amount / 1000000;
+    const roundedMillions = Math.round(millions * 10) / 10; // Round to 1 decimal
+    const decimal = roundedMillions % 1;
 
+    // Si el decimal es 0, no mostrarlo
     if (decimal === 0) {
-      return `$${Math.floor(thousands)}K`;
+      return `$${Math.floor(roundedMillions)}M`;
     }
 
-    return `$${thousands.toFixed(1).replace('.', ',')}K`;
+    // Si tiene decimal, mostrar con punto
+    return `$${roundedMillions.toFixed(1)}M`;
+  }
+
+  // For thousands, show as "X.XK" or "XK" (no decimal if .0)
+  if (amount >= 1000) {
+    const thousands = amount / 1000;
+    const roundedThousands = Math.round(thousands * 10) / 10;
+    const decimal = roundedThousands % 1;
+
+    if (decimal === 0) {
+      return `$${Math.floor(roundedThousands)}K`;
+    }
+
+    return `$${roundedThousands.toFixed(1)}K`;
   }
 
   // Otherwise show full number with Colombian format
