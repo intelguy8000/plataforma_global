@@ -76,13 +76,14 @@ export function ChatWidget() {
     if (lowerQuery.includes('revenue') || lowerQuery.includes('ingresos')) {
       if (lowerQuery.includes('anterior') || lowerQuery.includes('pasado') || lowerQuery.includes('vs') || lowerQuery.includes('comparar')) {
         const growth = ((metrics.revenue - prevMonthRevenue) / prevMonthRevenue * 100).toFixed(1);
+        const difference = metrics.revenue - prevMonthRevenue;
         return {
-          response: `Revenue actual: $${(metrics.revenue / 1000000).toFixed(0)}M COP\nRevenue mes anterior: $${(prevMonthRevenue / 1000000).toFixed(0)}M COP\n\n📈 Crecimiento: +${growth}% (+$${((metrics.revenue - prevMonthRevenue) / 1000000).toFixed(0)}M)`,
+          response: `Revenue actual: $${metrics.revenue.toLocaleString('es-CO')} COP\nRevenue mes anterior: $${prevMonthRevenue.toLocaleString('es-CO')} COP\n\n📈 Crecimiento: +${growth}% (+$${difference.toLocaleString('es-CO')})`,
           newContext: { lastMetric: 'revenue', lastValue: metrics.revenue, lastComparison: 'monthly' }
         };
       }
       return {
-        response: `Revenue actual: $${(metrics.revenue / 1000000).toFixed(0)}M COP (+12% vs mes anterior)`,
+        response: `Revenue actual: $${metrics.revenue.toLocaleString('es-CO')} COP (+12% vs mes anterior)`,
         newContext: { lastMetric: 'revenue', lastValue: metrics.revenue }
       };
     }
@@ -91,15 +92,16 @@ export function ChatWidget() {
     if ((lowerQuery.includes('anterior') || lowerQuery.includes('pasado') || lowerQuery.includes('vs')) && ctx.lastMetric) {
       if (ctx.lastMetric === 'revenue') {
         const growth = ((metrics.revenue - prevMonthRevenue) / prevMonthRevenue * 100).toFixed(1);
+        const difference = metrics.revenue - prevMonthRevenue;
         return {
-          response: `Revenue mes anterior: $${(prevMonthRevenue / 1000000).toFixed(0)}M COP\n\n📊 Diferencia: +$${((metrics.revenue - prevMonthRevenue) / 1000000).toFixed(0)}M (+${growth}%)`,
+          response: `Revenue mes anterior: $${prevMonthRevenue.toLocaleString('es-CO')} COP\n\n📊 Diferencia: +$${difference.toLocaleString('es-CO')} (+${growth}%)`,
           newContext: { ...ctx, lastComparison: 'done' }
         };
       }
       if (ctx.lastMetric === 'leads') {
         const growth = ((metrics.newLeads - prevMonthLeads) / prevMonthLeads * 100).toFixed(1);
         return {
-          response: `Leads mes anterior: ${prevMonthLeads}\n\n📊 Diferencia: +${metrics.newLeads - prevMonthLeads} (+${growth}%)`,
+          response: `Leads mes anterior: ${prevMonthLeads.toLocaleString('es-CO')}\n\n📊 Diferencia: +${(metrics.newLeads - prevMonthLeads).toLocaleString('es-CO')} (+${growth}%)`,
           newContext: { ...ctx, lastComparison: 'done' }
         };
       }
@@ -110,12 +112,12 @@ export function ChatWidget() {
       if (lowerQuery.includes('cuántos') || lowerQuery.includes('tenemos')) {
         const totalLeads = mockLeads.length;
         return {
-          response: `Total leads: ${totalLeads}\nNuevos este mes: ${metrics.newLeads}\nTasa conversión: ${metrics.conversionRate.toFixed(1)}%`,
+          response: `Total leads: ${totalLeads.toLocaleString('es-CO')}\nNuevos este mes: ${metrics.newLeads.toLocaleString('es-CO')}\nTasa conversión: ${metrics.conversionRate.toFixed(1)}%`,
           newContext: { lastMetric: 'leads', lastValue: metrics.newLeads }
         };
       }
       return {
-        response: `Leads nuevos este mes: ${metrics.newLeads} (+8.2% vs anterior)\nCanales top: Referral y Podcast`,
+        response: `Leads nuevos este mes: ${metrics.newLeads.toLocaleString('es-CO')} (+8.2% vs anterior)\nCanales top: Referral y Podcast`,
         newContext: { lastMetric: 'leads', lastValue: metrics.newLeads }
       };
     }
@@ -123,7 +125,7 @@ export function ChatWidget() {
     // Conversion queries
     if (lowerQuery.includes('conversión') || lowerQuery.includes('conversion')) {
       return {
-        response: `Tasa de conversión: ${metrics.conversionRate.toFixed(1)}%\nConversiones este mes: ${metrics.conversions}\nTiempo promedio: 35 días`,
+        response: `Tasa de conversión: ${metrics.conversionRate.toFixed(1)}%\nConversiones este mes: ${metrics.conversions.toLocaleString('es-CO')}\nTiempo promedio: 35 días`,
         newContext: { lastMetric: 'conversion', lastValue: metrics.conversionRate }
       };
     }
@@ -132,7 +134,7 @@ export function ChatWidget() {
     if (lowerQuery.includes('asesores') || lowerQuery.includes('mejores') || lowerQuery.includes('top')) {
       const top3 = getTopAdvisors(3);
       return {
-        response: `🏆 Top 3 Asesores:\n\n1️⃣ ${top3[0].name}: $${(top3[0].revenue / 1000000).toFixed(0)}M (${top3[0].conversionRate.toFixed(1)}%)\n2️⃣ ${top3[1].name}: $${(top3[1].revenue / 1000000).toFixed(0)}M (${top3[1].conversionRate.toFixed(1)}%)\n3️⃣ ${top3[2].name}: $${(top3[2].revenue / 1000000).toFixed(0)}M (${top3[2].conversionRate.toFixed(1)}%)`,
+        response: `🏆 Top 3 Asesores:\n\n1️⃣ ${top3[0].name}: $${top3[0].revenue.toLocaleString('es-CO')} (${top3[0].conversionRate.toFixed(1)}%)\n2️⃣ ${top3[1].name}: $${top3[1].revenue.toLocaleString('es-CO')} (${top3[1].conversionRate.toFixed(1)}%)\n3️⃣ ${top3[2].name}: $${top3[2].revenue.toLocaleString('es-CO')} (${top3[2].conversionRate.toFixed(1)}%)`,
         newContext: { lastMetric: 'advisors' }
       };
     }
@@ -141,15 +143,16 @@ export function ChatWidget() {
     if (lowerQuery.includes('estudiantes') || lowerQuery.includes('activos')) {
       const activeStudents = mockStudents.filter(s => s.stage === 'active').length;
       return {
-        response: `Estudiantes activos: ${activeStudents}\nTotal en pipeline: ${mockStudents.length}\nEn documentación: ${mockStudents.filter(s => s.stage === 'documentation').length}`,
+        response: `Estudiantes activos: ${activeStudents.toLocaleString('es-CO')}\nTotal en pipeline: ${mockStudents.length.toLocaleString('es-CO')}\nEn documentación: ${mockStudents.filter(s => s.stage === 'documentation').length.toLocaleString('es-CO')}`,
         newContext: { lastMetric: 'students', lastValue: activeStudents }
       };
     }
 
     // Suggestions/help
     if (lowerQuery.includes('sugerencia') || lowerQuery.includes('cerrar') || lowerQuery.includes('mejorar') || lowerQuery.includes('ventas')) {
+      const qualifiedLeads = mockLeads.filter(l => l.status === 'qualified').length;
       return {
-        response: `💡 Sugerencias para cerrar más en octubre:\n\n✅ Enfócate en los ${mockLeads.filter(l => l.status === 'qualified').length} leads calificados\n✅ Sigue el proceso de los top performers\n✅ Prioriza canales: Referral (32% conversión)`,
+        response: `💡 Sugerencias para cerrar más en octubre:\n\n✅ Enfócate en los ${qualifiedLeads.toLocaleString('es-CO')} leads calificados\n✅ Sigue el proceso de los top performers\n✅ Prioriza canales: Referral (32% conversión)`,
         newContext: {}
       };
     }
