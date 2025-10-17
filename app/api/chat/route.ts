@@ -8,6 +8,15 @@ const openai = new OpenAI({
 
 export async function POST(req: NextRequest) {
   try {
+    // Check if API key is available
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('OPENAI_API_KEY is not set');
+      return NextResponse.json({
+        error: 'API key not configured. Please contact support.',
+        success: false
+      }, { status: 500 });
+    }
+
     const { message, conversationHistory } = await req.json();
 
     // Get current data for context
@@ -105,9 +114,15 @@ Ejemplos de buen formato:
 
   } catch (error) {
     console.error('OpenAI API Error:', error);
+
+    // Log more details for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error details:', errorMessage);
+
     return NextResponse.json({
       error: 'Error procesando tu pregunta. Por favor intenta de nuevo.',
-      success: false
+      success: false,
+      details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
     }, { status: 500 });
   }
 }
