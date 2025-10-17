@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { getCurrentMonthMetrics, mockLeads, mockStudents, getTopAdvisors } from '@/lib/data/mock-data';
 
 interface Message {
   id: string;
@@ -15,17 +16,24 @@ interface Message {
   timestamp: Date;
 }
 
+interface ConversationContext {
+  lastMetric?: string;
+  lastValue?: number;
+  lastComparison?: string;
+}
+
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: '¡Hola! Soy tu asistente de JGSL. Puedo ayudarte con métricas del dashboard (revenue, leads, conversiones) y responder preguntas sobre los servicios de Estudiar en el Exterior (destinos, programas, becas). ¿En qué puedo ayudarte?',
+      text: '👋 Hola! Soy tu asistente de analytics interno. Puedo ayudarte con métricas del dashboard o información sobre nuestros servicios. ¿Qué necesitas?',
       sender: 'ai',
       timestamp: new Date()
     }
   ]);
   const [inputValue, setInputValue] = useState('');
+  const [context, setContext] = useState<ConversationContext>({});
 
   const handleSend = () => {
     if (!inputValue.trim()) return;
@@ -42,70 +50,156 @@ export function ChatWidget() {
 
     // Simulate AI response
     setTimeout(() => {
+      const { response, newContext } = generateAIResponse(inputValue, context);
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: generateAIResponse(inputValue),
+        text: response,
         sender: 'ai',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiMessage]);
-    }, 1000);
+      setContext(newContext);
+    }, 800);
 
     setInputValue('');
   };
 
-  const generateAIResponse = (query: string): string => {
+  const generateAIResponse = (query: string, ctx: ConversationContext): { response: string; newContext: ConversationContext } => {
     const lowerQuery = query.toLowerCase();
+    const metrics = getCurrentMonthMetrics();
 
-    // Business metrics (Mock data)
+    // Calculate previous month metrics (simulated)
+    const prevMonthRevenue = Math.round(metrics.revenue / 1.12); // 12% growth
+    const prevMonthLeads = Math.round(metrics.newLeads / 1.082); // 8.2% growth
+
+    // Revenue queries
     if (lowerQuery.includes('revenue') || lowerQuery.includes('ingresos')) {
-      return 'Los ingresos del mes actual son de $1,380M COP, con un crecimiento del 12% respecto al mes anterior. Los principales canales son: referral (35%), podcast (28%) y search (20%).';
+      if (lowerQuery.includes('anterior') || lowerQuery.includes('pasado') || lowerQuery.includes('vs') || lowerQuery.includes('comparar')) {
+        const growth = ((metrics.revenue - prevMonthRevenue) / prevMonthRevenue * 100).toFixed(1);
+        return {
+          response: `Revenue actual: $${(metrics.revenue / 1000000).toFixed(0)}M COP\nRevenue mes anterior: $${(prevMonthRevenue / 1000000).toFixed(0)}M COP\n\n📈 Crecimiento: +${growth}% (+$${((metrics.revenue - prevMonthRevenue) / 1000000).toFixed(0)}M)`,
+          newContext: { lastMetric: 'revenue', lastValue: metrics.revenue, lastComparison: 'monthly' }
+        };
+      }
+      return {
+        response: `Revenue actual: $${(metrics.revenue / 1000000).toFixed(0)}M COP (+12% vs mes anterior)`,
+        newContext: { lastMetric: 'revenue', lastValue: metrics.revenue }
+      };
     }
+
+    // Comparison with last metric
+    if ((lowerQuery.includes('anterior') || lowerQuery.includes('pasado') || lowerQuery.includes('vs')) && ctx.lastMetric) {
+      if (ctx.lastMetric === 'revenue') {
+        const growth = ((metrics.revenue - prevMonthRevenue) / prevMonthRevenue * 100).toFixed(1);
+        return {
+          response: `Revenue mes anterior: $${(prevMonthRevenue / 1000000).toFixed(0)}M COP\n\n📊 Diferencia: +$${((metrics.revenue - prevMonthRevenue) / 1000000).toFixed(0)}M (+${growth}%)`,
+          newContext: { ...ctx, lastComparison: 'done' }
+        };
+      }
+      if (ctx.lastMetric === 'leads') {
+        const growth = ((metrics.newLeads - prevMonthLeads) / prevMonthLeads * 100).toFixed(1);
+        return {
+          response: `Leads mes anterior: ${prevMonthLeads}\n\n📊 Diferencia: +${metrics.newLeads - prevMonthLeads} (+${growth}%)`,
+          newContext: { ...ctx, lastComparison: 'done' }
+        };
+      }
+    }
+
+    // Leads queries
     if (lowerQuery.includes('leads') || lowerQuery.includes('prospectos')) {
-      return 'Tienes 500 leads en total, con 78 nuevos leads este mes. La tasa de conversión promedio es del 28.5%. Los canales más efectivos son referral y podcast.';
+      if (lowerQuery.includes('cuántos') || lowerQuery.includes('tenemos')) {
+        const totalLeads = mockLeads.length;
+        return {
+          response: `Total leads: ${totalLeads}\nNuevos este mes: ${metrics.newLeads}\nTasa conversión: ${metrics.conversionRate.toFixed(1)}%`,
+          newContext: { lastMetric: 'leads', lastValue: metrics.newLeads }
+        };
+      }
+      return {
+        response: `Leads nuevos este mes: ${metrics.newLeads} (+8.2% vs anterior)\nCanales top: Referral y Podcast`,
+        newContext: { lastMetric: 'leads', lastValue: metrics.newLeads }
+      };
     }
-    if (lowerQuery.includes('conversion') || lowerQuery.includes('conversión')) {
-      return 'La tasa de conversión actual es del 28.5%. El tiempo promedio de conversión es de 35 días. Las mejores tasas de conversión vienen de leads de referral (32%) y eventos (30%).';
+
+    // Conversion queries
+    if (lowerQuery.includes('conversión') || lowerQuery.includes('conversion')) {
+      return {
+        response: `Tasa de conversión: ${metrics.conversionRate.toFixed(1)}%\nConversiones este mes: ${metrics.conversions}\nTiempo promedio: 35 días`,
+        newContext: { lastMetric: 'conversion', lastValue: metrics.conversionRate }
+      };
     }
-    if (lowerQuery.includes('advisors') || lowerQuery.includes('asesores')) {
-      return 'Tienes 8 asesores activos. Los top 3 por revenue son: Patricia Gómez ($1,380M COP), Claudia Ramírez ($1,560M COP) y Valentina Torres ($1,260M COP). La tasa de conversión promedio del equipo es 28.5%.';
+
+    // Advisors queries
+    if (lowerQuery.includes('asesores') || lowerQuery.includes('mejores') || lowerQuery.includes('top')) {
+      const top3 = getTopAdvisors(3);
+      return {
+        response: `🏆 Top 3 Asesores:\n\n1️⃣ ${top3[0].name}: $${(top3[0].revenue / 1000000).toFixed(0)}M (${top3[0].conversionRate.toFixed(1)}%)\n2️⃣ ${top3[1].name}: $${(top3[1].revenue / 1000000).toFixed(0)}M (${top3[1].conversionRate.toFixed(1)}%)\n3️⃣ ${top3[2].name}: $${(top3[2].revenue / 1000000).toFixed(0)}M (${top3[2].conversionRate.toFixed(1)}%)`,
+        newContext: { lastMetric: 'advisors' }
+      };
     }
-    if (lowerQuery.includes('students') || lowerQuery.includes('estudiantes')) {
-      return 'Actualmente hay 132 estudiantes activos en el pipeline. 45 están en etapa de documentación, 32 en aplicación, 28 en visa, 15 en pago y 12 activos en sus programas.';
+
+    // Students queries
+    if (lowerQuery.includes('estudiantes') || lowerQuery.includes('activos')) {
+      const activeStudents = mockStudents.filter(s => s.stage === 'active').length;
+      return {
+        response: `Estudiantes activos: ${activeStudents}\nTotal en pipeline: ${mockStudents.length}\nEn documentación: ${mockStudents.filter(s => s.stage === 'documentation').length}`,
+        newContext: { lastMetric: 'students', lastValue: activeStudents }
+      };
+    }
+
+    // Suggestions/help
+    if (lowerQuery.includes('sugerencia') || lowerQuery.includes('cerrar') || lowerQuery.includes('mejorar') || lowerQuery.includes('ventas')) {
+      return {
+        response: `💡 Sugerencias para cerrar más en octubre:\n\n✅ Enfócate en los ${mockLeads.filter(l => l.status === 'qualified').length} leads calificados\n✅ Sigue el proceso de los top performers\n✅ Prioriza canales: Referral (32% conversión)`,
+        newContext: {}
+      };
     }
 
     // Company info (Real data from estudiarenelexterior.co)
-    if (lowerQuery.includes('servicios') || lowerQuery.includes('qué ofrecen') || lowerQuery.includes('services')) {
-      return 'Estudiar en el Exterior ofrece: Cursos de idiomas en el exterior, programas universitarios internacionales, campamentos de verano, asistencia con visas estudiantiles, financiamiento educativo, y consultas gratuitas.';
-    }
-    if (lowerQuery.includes('países') || lowerQuery.includes('destinos') || lowerQuery.includes('dónde') || lowerQuery.includes('countries')) {
-      return 'Trabajamos con destinos en Europa (Alemania, España, Francia, Inglaterra, Irlanda, Italia, Malta), Américas (Canadá, Estados Unidos), y Asia-Pacífico (Australia, Dubái, Nueva Zelanda).';
-    }
-    if (lowerQuery.includes('programas') || lowerQuery.includes('tipos') || lowerQuery.includes('programs')) {
-      return 'Ofrecemos 3 tipos de programas: 1) Cursos de idiomas (perfeccionamiento del idioma), 2) Programas universitarios (convenios internacionales), 3) Campamentos de verano (experiencia académica y lúdica).';
-    }
-    if (lowerQuery.includes('experiencia') || lowerQuery.includes('años') || lowerQuery.includes('becas') || lowerQuery.includes('scholarships')) {
-      return 'Estudiar en el Exterior tiene +20 años de experiencia, 750+ convenios institucionales internacionales, equipo especializado en visas, y acceso a becas del 10-50% de descuento según programa.';
-    }
-    if (lowerQuery.includes('contacto') || lowerQuery.includes('oficinas') || lowerQuery.includes('ubicación') || lowerQuery.includes('contact')) {
-      return 'Oficinas: Bogotá (Calle 99 #9a-45, Of. 404a | 601-4109636), Medellín (Carrera 42 No. 3 Sur 81, Of. 611 | 604-3227220), Rionegro (Universidad Católica de Oriente | 315-4076453).';
-    }
-    if (lowerQuery.includes('precio') || lowerQuery.includes('costo') || lowerQuery.includes('financiamiento') || lowerQuery.includes('pricing')) {
-      return 'Los costos varían por programa e institución. Ofrecemos becas del 10-50% y financiamiento educativo a través de nuestro aliado Sufi. Programa de referidos con hasta $300,000 COP por referido.';
+    if (lowerQuery.includes('servicios') || lowerQuery.includes('qué ofrecen')) {
+      return {
+        response: `Nuestros servicios:\n\n📚 Cursos de idiomas\n🎓 Programas universitarios\n☀️ Campamentos de verano\n✈️ Asistencia con visas\n💰 Financiamiento educativo`,
+        newContext: {}
+      };
     }
 
-    return 'Entiendo tu pregunta. Puedo ayudarte con: métricas del dashboard (revenue, leads, conversiones, asesores), información de Estudiar en el Exterior (servicios, destinos, programas, becas, contacto). ¿Qué necesitas saber?';
+    if (lowerQuery.includes('países') || lowerQuery.includes('destinos') || lowerQuery.includes('dónde')) {
+      return {
+        response: `🌍 Destinos disponibles:\n\n🇪🇺 Europa: Alemania, España, Francia, UK, Irlanda, Italia, Malta\n🇺🇸 Américas: Canadá, USA\n🌏 Asia-Pacífico: Australia, Dubái, Nueva Zelanda`,
+        newContext: {}
+      };
+    }
+
+    if (lowerQuery.includes('becas') || lowerQuery.includes('descuento')) {
+      return {
+        response: `💰 Becas disponibles:\n\n10-50% de descuento según programa\n750+ convenios institucionales\n+20 años de experiencia`,
+        newContext: {}
+      };
+    }
+
+    if (lowerQuery.includes('oficinas') || lowerQuery.includes('contacto') || lowerQuery.includes('ubicación')) {
+      return {
+        response: `📍 Nuestras oficinas:\n\n🏢 Bogotá: Calle 99 #9a-45\n🏢 Medellín: Carrera 42 No. 3 Sur 81\n🏢 Rionegro: Universidad Católica`,
+        newContext: {}
+      };
+    }
+
+    // Default response
+    return {
+      response: `Puedo ayudarte con:\n\n📊 Métricas: revenue, leads, conversión, asesores\n🏢 Empresa: servicios, destinos, becas, oficinas\n\n¿Qué necesitas saber?`,
+      newContext: ctx
+    };
   };
 
   const handleClear = () => {
     setMessages([
       {
         id: '1',
-        text: '¡Hola! Soy tu asistente de JGSL. Puedo ayudarte con métricas del dashboard (revenue, leads, conversiones) y responder preguntas sobre los servicios de Estudiar en el Exterior (destinos, programas, becas). ¿En qué puedo ayudarte?',
+        text: '👋 Hola! Soy tu asistente de analytics interno. Puedo ayudarte con métricas del dashboard o información sobre nuestros servicios. ¿Qué necesitas?',
         sender: 'ai',
         timestamp: new Date()
       }
     ]);
+    setContext({});
   };
 
   return (
