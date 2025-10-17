@@ -1,25 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { MessageCircle, X, Send, Trash2 } from 'lucide-react';
+import { MessageCircle, X, Send, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { getCurrentMonthMetrics, mockLeads, mockStudents, getTopAdvisors } from '@/lib/data/mock-data';
 
 interface Message {
   id: string;
   text: string;
   sender: 'user' | 'ai';
   timestamp: Date;
-}
-
-interface ConversationContext {
-  lastMetric?: string;
-  lastValue?: number;
-  lastComparison?: string;
 }
 
 export function ChatWidget() {
@@ -33,170 +26,68 @@ export function ChatWidget() {
     }
   ]);
   const [inputValue, setInputValue] = useState('');
-  const [context, setContext] = useState<ConversationContext>({});
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
+  const handleSend = async () => {
+    if (!inputValue.trim() || isLoading) return;
+
+    const messageText = inputValue;
+    setInputValue('');
 
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: inputValue,
+      text: messageText,
       sender: 'user',
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const { response, newContext } = generateAIResponse(inputValue, context);
-      const aiMessage: Message = {
+    try {
+      // Build conversation history for OpenAI
+      const history = messages
+        .filter(m => m.id !== '1') // Exclude initial greeting
+        .map(m => ({
+          role: m.sender === 'user' ? 'user' : 'assistant',
+          content: m.text
+        }));
+
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: messageText,
+          conversationHistory: history
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: data.response,
+          sender: 'ai',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      } else {
+        throw new Error(data.error || 'Error desconocido');
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: response,
+        text: '❌ Lo siento, tuve un problema procesando tu pregunta. Por favor intenta de nuevo.',
         sender: 'ai',
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, aiMessage]);
-      setContext(newContext);
-    }, 800);
-
-    setInputValue('');
-  };
-
-  const generateAIResponse = (query: string, ctx: ConversationContext): { response: string; newContext: ConversationContext } => {
-    const lowerQuery = query.toLowerCase();
-    const metrics = getCurrentMonthMetrics();
-
-    // Calculate previous month metrics (simulated)
-    const prevMonthRevenue = Math.round(metrics.revenue / 1.12); // 12% growth
-    const prevMonthLeads = Math.round(metrics.newLeads / 1.082); // 8.2% growth
-
-    // Revenue/Sales queries
-    if (lowerQuery.includes('revenue') ||
-        lowerQuery.includes('ingresos') ||
-        lowerQuery.includes('vendido') ||
-        lowerQuery.includes('ventas') ||
-        lowerQuery.includes('facturado') ||
-        lowerQuery.includes('facturación')) {
-      if (lowerQuery.includes('anterior') || lowerQuery.includes('pasado') || lowerQuery.includes('vs') || lowerQuery.includes('comparar')) {
-        const growth = ((metrics.revenue - prevMonthRevenue) / prevMonthRevenue * 100).toFixed(1);
-        const difference = metrics.revenue - prevMonthRevenue;
-        return {
-          response: `Revenue actual: $${metrics.revenue.toLocaleString('es-CO')} COP\nRevenue mes anterior: $${prevMonthRevenue.toLocaleString('es-CO')} COP\n\n📈 Crecimiento: +${growth}% (+$${difference.toLocaleString('es-CO')})`,
-          newContext: { lastMetric: 'revenue', lastValue: metrics.revenue, lastComparison: 'monthly' }
-        };
-      }
-      return {
-        response: `Revenue este mes: $${metrics.revenue.toLocaleString('es-CO')} COP\n\n📈 Crecimiento: +12% vs mes anterior\n💰 Conversiones: ${metrics.conversions.toLocaleString('es-CO')}`,
-        newContext: { lastMetric: 'revenue', lastValue: metrics.revenue }
-      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
-
-    // Comparison with last metric
-    if ((lowerQuery.includes('anterior') || lowerQuery.includes('pasado') || lowerQuery.includes('vs')) && ctx.lastMetric) {
-      if (ctx.lastMetric === 'revenue') {
-        const growth = ((metrics.revenue - prevMonthRevenue) / prevMonthRevenue * 100).toFixed(1);
-        const difference = metrics.revenue - prevMonthRevenue;
-        return {
-          response: `Revenue mes anterior: $${prevMonthRevenue.toLocaleString('es-CO')} COP\n\n📊 Diferencia: +$${difference.toLocaleString('es-CO')} (+${growth}%)`,
-          newContext: { ...ctx, lastComparison: 'done' }
-        };
-      }
-      if (ctx.lastMetric === 'leads') {
-        const growth = ((metrics.newLeads - prevMonthLeads) / prevMonthLeads * 100).toFixed(1);
-        return {
-          response: `Leads mes anterior: ${prevMonthLeads.toLocaleString('es-CO')}\n\n📊 Diferencia: +${(metrics.newLeads - prevMonthLeads).toLocaleString('es-CO')} (+${growth}%)`,
-          newContext: { ...ctx, lastComparison: 'done' }
-        };
-      }
-    }
-
-    // Leads queries
-    if (lowerQuery.includes('leads') || lowerQuery.includes('prospectos')) {
-      if (lowerQuery.includes('cuántos') || lowerQuery.includes('tenemos')) {
-        const totalLeads = mockLeads.length;
-        return {
-          response: `Total leads: ${totalLeads.toLocaleString('es-CO')}\nNuevos este mes: ${metrics.newLeads.toLocaleString('es-CO')}\nTasa conversión: ${metrics.conversionRate.toFixed(1)}%`,
-          newContext: { lastMetric: 'leads', lastValue: metrics.newLeads }
-        };
-      }
-      return {
-        response: `Leads nuevos este mes: ${metrics.newLeads.toLocaleString('es-CO')} (+8.2% vs anterior)\nCanales top: Referral y Podcast`,
-        newContext: { lastMetric: 'leads', lastValue: metrics.newLeads }
-      };
-    }
-
-    // Conversion queries
-    if (lowerQuery.includes('conversión') || lowerQuery.includes('conversion')) {
-      return {
-        response: `Tasa de conversión: ${metrics.conversionRate.toFixed(1)}%\nConversiones este mes: ${metrics.conversions.toLocaleString('es-CO')}\nTiempo promedio: 35 días`,
-        newContext: { lastMetric: 'conversion', lastValue: metrics.conversionRate }
-      };
-    }
-
-    // Advisors queries
-    if (lowerQuery.includes('asesores') || lowerQuery.includes('mejores') || lowerQuery.includes('top')) {
-      const top3 = getTopAdvisors(3);
-      return {
-        response: `🏆 Top 3 Asesores:\n\n1️⃣ ${top3[0].name}: $${top3[0].revenue.toLocaleString('es-CO')} (${top3[0].conversionRate.toFixed(1)}%)\n2️⃣ ${top3[1].name}: $${top3[1].revenue.toLocaleString('es-CO')} (${top3[1].conversionRate.toFixed(1)}%)\n3️⃣ ${top3[2].name}: $${top3[2].revenue.toLocaleString('es-CO')} (${top3[2].conversionRate.toFixed(1)}%)`,
-        newContext: { lastMetric: 'advisors' }
-      };
-    }
-
-    // Students queries
-    if (lowerQuery.includes('estudiantes') || lowerQuery.includes('activos')) {
-      const activeStudents = mockStudents.filter(s => s.stage === 'active').length;
-      return {
-        response: `Estudiantes activos: ${activeStudents.toLocaleString('es-CO')}\nTotal en pipeline: ${mockStudents.length.toLocaleString('es-CO')}\nEn documentación: ${mockStudents.filter(s => s.stage === 'documentation').length.toLocaleString('es-CO')}`,
-        newContext: { lastMetric: 'students', lastValue: activeStudents }
-      };
-    }
-
-    // Suggestions/help (only if not asking about revenue/sales)
-    if ((lowerQuery.includes('sugerencia') || lowerQuery.includes('cerrar más') || lowerQuery.includes('mejorar')) &&
-        !lowerQuery.includes('vendido') && !lowerQuery.includes('ventas') && !lowerQuery.includes('cuánto')) {
-      const qualifiedLeads = mockLeads.filter(l => l.status === 'qualified').length;
-      return {
-        response: `💡 Sugerencias para cerrar más en octubre:\n\n✅ Enfócate en los ${qualifiedLeads.toLocaleString('es-CO')} leads calificados\n✅ Sigue el proceso de los top performers\n✅ Prioriza canales: Referral (32% conversión)`,
-        newContext: {}
-      };
-    }
-
-    // Company info (Real data from estudiarenelexterior.co)
-    if (lowerQuery.includes('servicios') || lowerQuery.includes('qué ofrecen')) {
-      return {
-        response: `Nuestros servicios:\n\n📚 Cursos de idiomas\n🎓 Programas universitarios\n☀️ Campamentos de verano\n✈️ Asistencia con visas\n💰 Financiamiento educativo`,
-        newContext: {}
-      };
-    }
-
-    if (lowerQuery.includes('países') || lowerQuery.includes('destinos') || lowerQuery.includes('dónde')) {
-      return {
-        response: `🌍 Destinos disponibles:\n\n🇪🇺 Europa: Alemania, España, Francia, UK, Irlanda, Italia, Malta\n🇺🇸 Américas: Canadá, USA\n🌏 Asia-Pacífico: Australia, Dubái, Nueva Zelanda`,
-        newContext: {}
-      };
-    }
-
-    if (lowerQuery.includes('becas') || lowerQuery.includes('descuento')) {
-      return {
-        response: `💰 Becas disponibles:\n\n10-50% de descuento según programa\n750+ convenios institucionales\n+20 años de experiencia`,
-        newContext: {}
-      };
-    }
-
-    if (lowerQuery.includes('oficinas') || lowerQuery.includes('contacto') || lowerQuery.includes('ubicación')) {
-      return {
-        response: `📍 Nuestras oficinas:\n\n🏢 Bogotá: Calle 99 #9a-45\n🏢 Medellín: Carrera 42 No. 3 Sur 81\n🏢 Rionegro: Universidad Católica`,
-        newContext: {}
-      };
-    }
-
-    // Default response
-    return {
-      response: `Puedo ayudarte con:\n\n📊 Métricas: revenue, leads, conversión, asesores\n🏢 Empresa: servicios, destinos, becas, oficinas\n\n¿Qué necesitas saber?`,
-      newContext: ctx
-    };
   };
 
   const handleClear = () => {
@@ -208,7 +99,6 @@ export function ChatWidget() {
         timestamp: new Date()
       }
     ]);
-    setContext({});
   };
 
   return (
@@ -282,6 +172,16 @@ export function ChatWidget() {
                   </div>
                 </div>
               ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="max-w-[80%] rounded-lg px-4 py-2 text-sm bg-muted">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Pensando...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </ScrollArea>
 
@@ -299,9 +199,14 @@ export function ChatWidget() {
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Escribe tu pregunta..."
                 className="flex-1"
+                disabled={isLoading}
               />
-              <Button type="submit" size="icon">
-                <Send className="h-4 w-4" />
+              <Button type="submit" size="icon" disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
               </Button>
             </form>
           </div>
