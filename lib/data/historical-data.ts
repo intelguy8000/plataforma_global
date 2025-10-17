@@ -1,11 +1,11 @@
-// Historical data for 24 months (Nov 2023 - Oct 2025)
-// Realistic scale for education consulting business
+// Static historical data for 24 months (Nov 2023 - Oct 2025)
+// Fixed data to ensure consistency across chat and dashboards
 
-import { addMonths, format, startOfMonth } from 'date-fns';
+import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export interface MonthlyMetrics {
-  yearMonth: string;        // "2023-01"
+  yearMonth: string;        // "2024-01"
   year: number;
   month: number;            // 0-11
   monthName: string;        // "Enero"
@@ -33,150 +33,89 @@ export interface MonthlyMetrics {
   yoyGrowth: number;        // Year-over-year %
 }
 
-// Seasonal multipliers based on Colombian education market
-const SEASONAL_MULTIPLIERS: Record<string, { leads: number; conversion: number; revenue: number }> = {
-  // Q4 (Nov-Dec)
-  nov: { leads: 1.0, conversion: 0.85, revenue: 0.90 },
-  dec: { leads: 0.5, conversion: 0.70, revenue: 0.65 },
+// Static 24 months of data - Nov 2023 to Oct 2025
+// These numbers are fixed to avoid inconsistencies between chat and dashboards
+const STATIC_DATA: Omit<MonthlyMetrics, 'date' | 'monthName'>[] = [
+  // Nov 2023
+  { yearMonth: '2023-11', year: 2023, month: 10, revenue: 105_000_000, costs: 42_000_000, grossProfit: 63_000_000, netProfit: 47_250_000, marginPercentage: 60, leads: 420, conversions: 42, conversionRate: 10, activeStudents: 39, averageCommission: 2_500_000, cac: 1_000_000, momGrowth: 0, yoyGrowth: 0 },
 
-  // Q1 - HIGH SEASON (New Year enrollments)
-  jan: { leads: 1.6, conversion: 1.15, revenue: 1.25 },
-  feb: { leads: 1.8, conversion: 1.20, revenue: 1.30 },
-  mar: { leads: 1.5, conversion: 1.10, revenue: 1.20 },
+  // Dec 2023
+  { yearMonth: '2023-12', year: 2023, month: 11, revenue: 68_000_000, costs: 27_200_000, grossProfit: 40_800_000, netProfit: 30_600_000, marginPercentage: 60, leads: 210, conversions: 20, conversionRate: 9.5, activeStudents: 18, averageCommission: 3_400_000, cac: 1_360_000, momGrowth: -35.2, yoyGrowth: 0 },
 
-  // Q2
-  apr: { leads: 0.7, conversion: 0.90, revenue: 0.85 },
-  may: { leads: 1.1, conversion: 1.00, revenue: 1.05 },
-  jun: { leads: 1.3, conversion: 1.05, revenue: 1.10 },
+  // Jan 2024 - HIGH SEASON
+  { yearMonth: '2024-01', year: 2024, month: 0, revenue: 350_000_000, costs: 140_000_000, grossProfit: 210_000_000, netProfit: 157_500_000, marginPercentage: 60, leads: 672, conversions: 84, conversionRate: 12.5, activeStudents: 77, averageCommission: 4_167_000, cac: 1_667_000, momGrowth: 414.7, yoyGrowth: 0 },
 
-  // Q3 - MID SEASON (Summer programs)
-  jul: { leads: 1.4, conversion: 1.10, revenue: 1.15 },
-  aug: { leads: 1.3, conversion: 1.08, revenue: 1.12 },
-  sep: { leads: 1.0, conversion: 0.95, revenue: 1.00 },
+  // Feb 2024 - HIGH SEASON
+  { yearMonth: '2024-02', year: 2024, month: 1, revenue: 365_000_000, costs: 146_000_000, grossProfit: 219_000_000, netProfit: 164_250_000, marginPercentage: 60, leads: 756, conversions: 88, conversionRate: 11.6, activeStudents: 81, averageCommission: 4_148_000, cac: 1_659_000, momGrowth: 4.3, yoyGrowth: 0 },
 
-  // Q4
-  oct: { leads: 1.1, conversion: 1.00, revenue: 1.05 },
-};
+  // Mar 2024 - HIGH SEASON
+  { yearMonth: '2024-03', year: 2024, month: 2, revenue: 315_000_000, costs: 126_000_000, grossProfit: 189_000_000, netProfit: 141_750_000, marginPercentage: 60, leads: 630, conversions: 75, conversionRate: 11.9, activeStudents: 69, averageCommission: 4_200_000, cac: 1_680_000, momGrowth: -13.7, yoyGrowth: 0 },
 
-// Growth model: 20% annual growth compounded
-const ANNUAL_GROWTH_RATE = 1.20;
+  // Apr 2024
+  { yearMonth: '2024-04', year: 2024, month: 3, revenue: 135_000_000, costs: 54_000_000, grossProfit: 81_000_000, netProfit: 60_750_000, marginPercentage: 60, leads: 294, conversions: 35, conversionRate: 11.9, activeStudents: 32, averageCommission: 3_857_000, cac: 1_543_000, momGrowth: -57.1, yoyGrowth: 0 },
 
-// Base numbers (November 2023)
-const BASE_MONTHLY_LEADS = 420;
-const BASE_CONVERSION_RATE = 0.10;  // 10%
-const BASE_AVG_COMMISSION = 3_200_000;  // 3.2M COP per student
+  // May 2024
+  { yearMonth: '2024-05', year: 2024, month: 4, revenue: 210_000_000, costs: 84_000_000, grossProfit: 126_000_000, netProfit: 94_500_000, marginPercentage: 60, leads: 462, conversions: 52, conversionRate: 11.3, activeStudents: 48, averageCommission: 4_038_000, cac: 1_615_000, momGrowth: 55.6, yoyGrowth: 0 },
 
-// Add random variance
-function randomVariance(variance: number = 0.08): number {
-  return 1 + (Math.random() - 0.5) * 2 * variance;
-}
+  // Jun 2024
+  { yearMonth: '2024-06', year: 2024, month: 5, revenue: 255_000_000, costs: 102_000_000, grossProfit: 153_000_000, netProfit: 114_750_000, marginPercentage: 60, leads: 546, conversions: 60, conversionRate: 11.0, activeStudents: 55, averageCommission: 4_250_000, cac: 1_700_000, momGrowth: 21.4, yoyGrowth: 0 },
 
-// Generate 24 months of historical data (Nov 2023 - Oct 2025)
-export function generateHistoricalData(): MonthlyMetrics[] {
-  const startDate = new Date('2023-11-01');
-  const endDate = new Date('2025-10-31');
-  const metrics: MonthlyMetrics[] = [];
+  // Jul 2024 - MID SEASON
+  { yearMonth: '2024-07', year: 2024, month: 6, revenue: 295_000_000, costs: 118_000_000, grossProfit: 177_000_000, netProfit: 132_750_000, marginPercentage: 60, leads: 588, conversions: 68, conversionRate: 11.6, activeStudents: 63, averageCommission: 4_338_000, cac: 1_735_000, momGrowth: 15.7, yoyGrowth: 0 },
 
-  let currentDate = startOfMonth(startDate);
+  // Aug 2024 - MID SEASON
+  { yearMonth: '2024-08', year: 2024, month: 7, revenue: 285_000_000, costs: 114_000_000, grossProfit: 171_000_000, netProfit: 128_250_000, marginPercentage: 60, leads: 546, conversions: 65, conversionRate: 11.9, activeStudents: 60, averageCommission: 4_385_000, cac: 1_754_000, momGrowth: -3.4, yoyGrowth: 0 },
 
-  while (currentDate <= endDate) {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const yearMonth = format(currentDate, 'yyyy-MM');
-    const monthKey = format(currentDate, 'MMM').toLowerCase() as keyof typeof SEASONAL_MULTIPLIERS;
-    const monthName = format(currentDate, 'MMMM', { locale: es });
+  // Sep 2024
+  { yearMonth: '2024-09', year: 2024, month: 8, revenue: 220_000_000, costs: 88_000_000, grossProfit: 132_000_000, netProfit: 99_000_000, marginPercentage: 60, leads: 420, conversions: 50, conversionRate: 11.9, activeStudents: 46, averageCommission: 4_400_000, cac: 1_760_000, momGrowth: -22.8, yoyGrowth: 0 },
 
-    // Calculate cumulative growth
-    const monthsFromStart = Math.floor((currentDate.getTime() - startDate.getTime()) / (30.44 * 24 * 60 * 60 * 1000));
-    const cumulativeGrowth = Math.pow(ANNUAL_GROWTH_RATE, monthsFromStart / 12);
+  // Oct 2024
+  { yearMonth: '2024-10', year: 2024, month: 9, revenue: 240_000_000, costs: 96_000_000, grossProfit: 144_000_000, netProfit: 108_000_000, marginPercentage: 60, leads: 462, conversions: 55, conversionRate: 11.9, activeStudents: 51, averageCommission: 4_364_000, cac: 1_745_000, momGrowth: 9.1, yoyGrowth: 0 },
 
-    // Get seasonal multiplier
-    const seasonal = SEASONAL_MULTIPLIERS[monthKey] || { leads: 1.0, conversion: 1.0, revenue: 1.0 };
+  // Nov 2024
+  { yearMonth: '2024-11', year: 2024, month: 10, revenue: 250_000_000, costs: 100_000_000, grossProfit: 150_000_000, netProfit: 112_500_000, marginPercentage: 60, leads: 504, conversions: 60, conversionRate: 11.9, activeStudents: 55, averageCommission: 4_167_000, cac: 1_667_000, momGrowth: 4.2, yoyGrowth: 138.1 },
 
-    // Calculate leads
-    const leads = Math.round(
-      BASE_MONTHLY_LEADS *
-      cumulativeGrowth *
-      seasonal.leads *
-      randomVariance(0.10)
-    );
+  // Dec 2024
+  { yearMonth: '2024-12', year: 2024, month: 11, revenue: 160_000_000, costs: 64_000_000, grossProfit: 96_000_000, netProfit: 72_000_000, marginPercentage: 60, leads: 252, conversions: 40, conversionRate: 15.9, activeStudents: 37, averageCommission: 4_000_000, cac: 1_600_000, momGrowth: -36.0, yoyGrowth: 135.3 },
 
-    // Calculate conversion rate with gradual improvement
-    const conversionRateImprovement = monthsFromStart * 0.002; // +0.2% per month
-    const conversionRate = Math.min(
-      0.16, // Cap at 16%
-      (BASE_CONVERSION_RATE + conversionRateImprovement) * seasonal.conversion * randomVariance(0.08)
-    );
+  // Jan 2025 - HIGH SEASON
+  { yearMonth: '2025-01', year: 2025, month: 0, revenue: 420_000_000, costs: 168_000_000, grossProfit: 252_000_000, netProfit: 189_000_000, marginPercentage: 60, leads: 806, conversions: 100, conversionRate: 12.4, activeStudents: 92, averageCommission: 4_200_000, cac: 1_680_000, momGrowth: 162.5, yoyGrowth: 20.0 },
 
-    // Calculate conversions
-    const conversions = Math.round(leads * conversionRate);
+  // Feb 2025 - HIGH SEASON
+  { yearMonth: '2025-02', year: 2025, month: 1, revenue: 438_000_000, costs: 175_200_000, grossProfit: 262_800_000, netProfit: 197_100_000, marginPercentage: 60, leads: 907, conversions: 106, conversionRate: 11.7, activeStudents: 98, averageCommission: 4_132_000, cac: 1_653_000, momGrowth: 4.3, yoyGrowth: 20.0 },
 
-    // Calculate average commission with gradual increase
-    const commissionGrowth = 1 + (monthsFromStart * 0.008); // +0.8% per month
-    const avgCommission = Math.round(
-      BASE_AVG_COMMISSION *
-      commissionGrowth *
-      seasonal.revenue *
-      randomVariance(0.12)
-    );
+  // Mar 2025 - HIGH SEASON
+  { yearMonth: '2025-03', year: 2025, month: 2, revenue: 378_000_000, costs: 151_200_000, grossProfit: 226_800_000, netProfit: 170_100_000, marginPercentage: 60, leads: 756, conversions: 90, conversionRate: 11.9, activeStudents: 83, averageCommission: 4_200_000, cac: 1_680_000, momGrowth: -13.7, yoyGrowth: 20.0 },
 
-    // Calculate revenue
-    const revenue = conversions * avgCommission;
+  // Apr 2025
+  { yearMonth: '2025-04', year: 2025, month: 3, revenue: 162_000_000, costs: 64_800_000, grossProfit: 97_200_000, netProfit: 72_900_000, marginPercentage: 60, leads: 353, conversions: 42, conversionRate: 11.9, activeStudents: 39, averageCommission: 3_857_000, cac: 1_543_000, momGrowth: -57.1, yoyGrowth: 20.0 },
 
-    // Calculate costs (40% of revenue)
-    const costs = Math.round(revenue * 0.40);
-    const grossProfit = revenue - costs;
-    const netProfit = Math.round(grossProfit * 0.75); // 75% net margin
-    const marginPercentage = (grossProfit / revenue) * 100;
+  // May 2025
+  { yearMonth: '2025-05', year: 2025, month: 4, revenue: 252_000_000, costs: 100_800_000, grossProfit: 151_200_000, netProfit: 113_400_000, marginPercentage: 60, leads: 554, conversions: 62, conversionRate: 11.2, activeStudents: 57, averageCommission: 4_065_000, cac: 1_626_000, momGrowth: 55.6, yoyGrowth: 20.0 },
 
-    // Calculate CAC
-    const marketingCosts = Math.round(costs * 0.35); // 35% of costs go to marketing
-    const cac = Math.round(marketingCosts / conversions);
+  // Jun 2025
+  { yearMonth: '2025-06', year: 2025, month: 5, revenue: 306_000_000, costs: 122_400_000, grossProfit: 183_600_000, netProfit: 137_700_000, marginPercentage: 60, leads: 655, conversions: 72, conversionRate: 11.0, activeStudents: 66, averageCommission: 4_250_000, cac: 1_700_000, momGrowth: 21.4, yoyGrowth: 20.0 },
 
-    // Calculate growth rates
-    const momGrowth = metrics.length > 0
-      ? ((revenue - metrics[metrics.length - 1].revenue) / metrics[metrics.length - 1].revenue) * 100
-      : 0;
+  // Jul 2025 - MID SEASON
+  { yearMonth: '2025-07', year: 2025, month: 6, revenue: 354_000_000, costs: 141_600_000, grossProfit: 212_400_000, netProfit: 159_300_000, marginPercentage: 60, leads: 706, conversions: 82, conversionRate: 11.6, activeStudents: 75, averageCommission: 4_317_000, cac: 1_727_000, momGrowth: 15.7, yoyGrowth: 20.0 },
 
-    const yoyGrowth = metrics.length >= 12
-      ? ((revenue - metrics[metrics.length - 12].revenue) / metrics[metrics.length - 12].revenue) * 100
-      : 0;
+  // Aug 2025 - MID SEASON
+  { yearMonth: '2025-08', year: 2025, month: 7, revenue: 342_000_000, costs: 136_800_000, grossProfit: 205_200_000, netProfit: 153_900_000, marginPercentage: 60, leads: 655, conversions: 78, conversionRate: 11.9, activeStudents: 72, averageCommission: 4_385_000, cac: 1_754_000, momGrowth: -3.4, yoyGrowth: 20.0 },
 
-    metrics.push({
-      yearMonth,
-      year,
-      month,
-      monthName,
-      date: currentDate,
-      revenue,
-      costs,
-      grossProfit,
-      netProfit,
-      marginPercentage,
-      leads,
-      conversions,
-      conversionRate: conversionRate * 100,
-      activeStudents: Math.round(conversions * 0.92), // 92% remain active
-      averageCommission: avgCommission,
-      cac,
-      momGrowth,
-      yoyGrowth
-    });
+  // Sep 2025
+  { yearMonth: '2025-09', year: 2025, month: 8, revenue: 264_000_000, costs: 105_600_000, grossProfit: 158_400_000, netProfit: 118_800_000, marginPercentage: 60, leads: 504, conversions: 60, conversionRate: 11.9, activeStudents: 55, averageCommission: 4_400_000, cac: 1_760_000, momGrowth: -22.8, yoyGrowth: 20.0 },
 
-    currentDate = addMonths(currentDate, 1);
-  }
+  // Oct 2025
+  { yearMonth: '2025-10', year: 2025, month: 9, revenue: 288_000_000, costs: 115_200_000, grossProfit: 172_800_000, netProfit: 129_600_000, marginPercentage: 60, leads: 554, conversions: 66, conversionRate: 11.9, activeStudents: 61, averageCommission: 4_364_000, cac: 1_745_000, momGrowth: 9.1, yoyGrowth: 20.0 },
+];
 
-  return metrics;
-}
-
-// Get historical data (memoized)
-let cachedHistoricalData: MonthlyMetrics[] | null = null;
-
+// Convert static data to full MonthlyMetrics with Date objects
 export function getHistoricalData(): MonthlyMetrics[] {
-  if (!cachedHistoricalData) {
-    cachedHistoricalData = generateHistoricalData();
-  }
-  return cachedHistoricalData;
+  return STATIC_DATA.map(item => ({
+    ...item,
+    date: new Date(item.yearMonth + '-01'),
+    monthName: format(new Date(item.yearMonth + '-01'), 'MMMM', { locale: es })
+  }));
 }
 
 // Get data for specific time range
