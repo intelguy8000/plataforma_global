@@ -27,15 +27,6 @@ import {
   ExecutiveKPI
 } from '@/types';
 
-// Helper functions
-const getRandomElement = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
-const getRandomNumber = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
-const getRandomDate = (daysAgo: number) => {
-  const date = new Date();
-  date.setDate(date.getDate() - getRandomNumber(0, daysAgo));
-  return date;
-};
-
 // Constants
 const FIRST_NAMES = [
   'Juan', 'María', 'Carlos', 'Ana', 'Luis', 'Laura', 'Diego', 'Valentina',
@@ -56,7 +47,6 @@ const CITIES: City[] = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartage
 const CHANNELS: Channel[] = ['referral', 'podcast', 'search', 'event', 'linkedin', 'instagram', 'facebook', 'google_ads', 'whatsapp'];
 const PROGRAM_TYPES: ProgramType[] = ['english', 'undergraduate', 'masters', 'phd'];
 const COUNTRIES: Country[] = ['USA', 'Canada', 'UK', 'Australia', 'Ireland', 'New Zealand', 'Germany'];
-const LEAD_STATUSES: LeadStatus[] = ['new', 'contacted', 'qualified', 'converted'];
 const PIPELINE_STAGES: PipelineStage[] = ['documentation', 'application', 'visa', 'payment', 'active'];
 const AGE_RANGES: AgeRange[] = ['18-22', '23-27', '28-35', '36+'];
 const STUDENT_STATUSES: StudentStatus[] = ['active', 'graduated', 'dropped', 'on_hold'];
@@ -182,46 +172,103 @@ export const mockAdvisors: Advisor[] = [
   }
 ];
 
-// Generate Leads
+// Generate Leads - Static deterministic data
+// Distribution: 100 new, 160 contacted, 180 qualified, 60 converted
 const generateLead = (index: number): Lead => {
-  const firstName = getRandomElement(FIRST_NAMES);
-  const lastName = getRandomElement(LAST_NAMES);
-  const status = getRandomElement(LEAD_STATUSES);
-  const createdAt = getRandomDate(90);
-  const firstVisitDate = new Date(createdAt.getTime() - getRandomNumber(1, 14) * 24 * 60 * 60 * 1000);
+  const firstName = FIRST_NAMES[index % FIRST_NAMES.length];
+  const lastName = LAST_NAMES[(index * 7) % LAST_NAMES.length];
+
+  // Deterministic status distribution
+  let status: LeadStatus;
+  if (index < 100) {
+    status = 'new';
+  } else if (index < 260) {
+    status = 'contacted';
+  } else if (index < 440) {
+    status = 'qualified';
+  } else {
+    status = 'converted';
+  }
+
+  // Deterministic date: spread leads over last 90 days
+  const daysAgo = (index * 13) % 90;
+  const createdAt = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
+  const firstVisitDate = new Date(createdAt.getTime() - ((index * 3) % 14 + 1) * 24 * 60 * 60 * 1000);
+
+  // Deterministic expected revenue using formula
+  const expectedRevenue = 2_000_000 + ((index * 12347) % 6_000_000);
+
+  // Deterministic age
+  const age = 18 + ((index * 7) % 28);
+
+  // Deterministic phone number
+  const phoneArea = 300 + (index % 51);
+  const phone1 = 100 + ((index * 13) % 900);
+  const phone2 = 1000 + ((index * 17) % 9000);
 
   return {
     id: `lead-${index}`,
     name: `${firstName} ${lastName}`,
     email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${index}@email.com`,
-    phone: `+57 ${getRandomNumber(300, 350)} ${getRandomNumber(100, 999)} ${getRandomNumber(1000, 9999)}`,
-    city: getRandomElement(CITIES),
+    phone: `+57 ${phoneArea} ${phone1} ${phone2}`,
+    city: CITIES[index % CITIES.length],
     status,
-    channel: getRandomElement(CHANNELS),
-    programType: getRandomElement(PROGRAM_TYPES),
-    targetCountry: getRandomElement(COUNTRIES),
-    advisorId: getRandomElement(mockAdvisors).id,
+    channel: CHANNELS[index % CHANNELS.length],
+    programType: PROGRAM_TYPES[index % PROGRAM_TYPES.length],
+    targetCountry: COUNTRIES[index % COUNTRIES.length],
+    advisorId: mockAdvisors[index % mockAdvisors.length].id,
     createdAt,
-    lastContactedAt: status !== 'new' ? new Date(createdAt.getTime() + getRandomNumber(1, 7) * 24 * 60 * 60 * 1000) : undefined,
-    convertedAt: status === 'converted' ? new Date(createdAt.getTime() + getRandomNumber(14, 60) * 24 * 60 * 60 * 1000) : undefined,
-    expectedRevenue: getRandomNumber(2_000_000, 8_000_000), // $500-$2k USD -> 2M-8M COP (avg ~4M)
-    age: getRandomNumber(18, 45),
-    webSource: getRandomElement(WEB_SOURCES),
+    lastContactedAt: status !== 'new' ? new Date(createdAt.getTime() + ((index * 5) % 7 + 1) * 24 * 60 * 60 * 1000) : undefined,
+    convertedAt: status === 'converted' ? new Date(createdAt.getTime() + (14 + (index * 11) % 47) * 24 * 60 * 60 * 1000) : undefined,
+    expectedRevenue,
+    age,
+    webSource: WEB_SOURCES[index % WEB_SOURCES.length],
     firstVisitDate,
-    utmSource: getRandomElement(UTM_SOURCES),
-    utmMedium: getRandomElement(UTM_MEDIUMS),
-    utmCampaign: getRandomElement(UTM_CAMPAIGNS)
+    utmSource: UTM_SOURCES[index % UTM_SOURCES.length],
+    utmMedium: UTM_MEDIUMS[index % UTM_MEDIUMS.length],
+    utmCampaign: UTM_CAMPAIGNS[index % UTM_CAMPAIGNS.length]
   };
 };
 
-export const mockLeads: Lead[] = Array.from({ length: 500 }, (_, i) => generateLead(i + 1));
+export const mockLeads: Lead[] = Array.from({ length: 500 }, (_, i) => generateLead(i));
 
-// Generate Students (converted leads)
+// Generate Students (converted leads) - Static deterministic data
 const convertedLeads = mockLeads.filter(lead => lead.status === 'converted');
 export const mockStudents: Student[] = convertedLeads.map((lead, index) => {
-  const age = lead.age || getRandomNumber(18, 45);
-  const stage = getRandomElement(PIPELINE_STAGES);
-  const isGraduated = stage === 'active' && Math.random() > 0.7;
+  const age = lead.age || 18;
+
+  // Deterministic stage distribution
+  const stageIndex = index % 5;
+  const stage = PIPELINE_STAGES[stageIndex];
+
+  // Deterministic graduation status (30% graduated from active stage)
+  const isGraduated = stage === 'active' && (index % 10) >= 7;
+
+  // Deterministic student status
+  let status: StudentStatus;
+  if (isGraduated) {
+    status = 'graduated';
+  } else {
+    status = STUDENT_STATUSES[index % STUDENT_STATUSES.length];
+  }
+
+  // Deterministic success score
+  const successScore = 65 + ((index * 19) % 36);
+
+  // Deterministic GPA (3.0 - 4.5)
+  const gpa = Math.round((30 + ((index * 23) % 16)) / 10 * 10) / 10;
+
+  // Deterministic satisfaction score (3-5)
+  const satisfactionScore = 3 + ((index * 7) % 3);
+
+  // Deterministic last updated (last 30 days)
+  const lastUpdatedDaysAgo = (index * 11) % 30;
+  const lastUpdated = new Date(Date.now() - lastUpdatedDaysAgo * 24 * 60 * 60 * 1000);
+
+  // Program duration in days
+  const programDuration = lead.programType === 'english' ? 180 :
+                         lead.programType === 'undergraduate' ? 1460 :
+                         lead.programType === 'masters' ? 730 : 1460;
 
   return {
     id: `student-${index + 1}`,
@@ -232,48 +279,62 @@ export const mockStudents: Student[] = convertedLeads.map((lead, index) => {
     stage,
     programType: lead.programType,
     targetCountry: lead.targetCountry,
-    university: getRandomElement(UNIVERSITIES),
+    university: UNIVERSITIES[index % UNIVERSITIES.length],
     advisorId: lead.advisorId,
     revenue: lead.expectedRevenue,
     startDate: lead.convertedAt!,
-    expectedGraduationDate: new Date(lead.convertedAt!.getTime() + (lead.programType === 'english' ? 180 : lead.programType === 'masters' ? 730 : 1460) * 24 * 60 * 60 * 1000),
-    lastUpdated: getRandomDate(30),
+    expectedGraduationDate: new Date(lead.convertedAt!.getTime() + programDuration * 24 * 60 * 60 * 1000),
+    lastUpdated,
     age,
     ageRange: getAgeRange(age),
-    status: isGraduated ? 'graduated' : getRandomElement(STUDENT_STATUSES),
-    successScore: getRandomNumber(65, 100),
+    status,
+    successScore,
     graduationStatus: isGraduated ? 'graduated' : 'in_progress',
-    gpa: Math.round((getRandomNumber(30, 45) / 10) * 10) / 10, // 3.0 - 4.5
-    satisfactionScore: getRandomNumber(3, 5)
+    gpa,
+    satisfactionScore
   };
 });
 
-// Generate Historical Metrics (last 90 days)
+// Generate Historical Metrics (last 90 days) - Static deterministic data
 export const mockHistoricalMetrics: MetricData[] = Array.from({ length: 90 }, (_, i) => {
-  const date = new Date();
-  date.setDate(date.getDate() - (89 - i));
+  const date = new Date(Date.now() - (89 - i) * 24 * 60 * 60 * 1000);
+
+  // Deterministic revenue with some wave pattern
+  const baseRevenue = 8_000_000;
+  const variation = Math.floor(Math.sin(i / 7) * 1_500_000 + Math.cos(i / 13) * 500_000);
+  const revenue = baseRevenue + variation;
+
+  // Deterministic leads (~16/day with variation)
+  const leads = 14 + ((i * 7) % 7);
+
+  // Deterministic conversions (~2/day with variation)
+  const conversions = 1 + ((i * 3) % 3);
+
+  // Deterministic active students (around 55)
+  const activeStudents = 55 + ((i * 5) % 7) - 3;
 
   return {
     date,
-    revenue: getRandomNumber(6_000_000, 10_000_000), // ~$1.5k-2.5k USD daily -> 6M-10M COP
-    leads: getRandomNumber(14, 20), // ~500 leads/month = ~16/day
-    conversions: getRandomNumber(1, 3), // ~60 conversions/month = ~2/day
-    activeStudents: 55 + getRandomNumber(-3, 3)
+    revenue,
+    leads,
+    conversions,
+    activeStudents
   };
 });
 
 // Last 30 days for trending
 export const mockLast30DaysMetrics = mockHistoricalMetrics.slice(-30);
 
-// Channel Metrics
-export const mockChannelMetrics: ChannelMetric[] = CHANNELS.map(channel => {
+// Channel Metrics - Calculated from static leads
+export const mockChannelMetrics: ChannelMetric[] = CHANNELS.map((channel, channelIndex) => {
   const leads = mockLeads.filter(l => l.channel === channel).length;
   const conversions = mockLeads.filter(l => l.channel === channel && l.status === 'converted').length;
   const revenue = mockLeads
     .filter(l => l.channel === channel && l.status === 'converted')
     .reduce((sum, l) => sum + l.expectedRevenue, 0);
 
-  const cac = getRandomNumber(800_000, 2_000_000); // $200-$500 USD -> 800k-2M COP
+  // Deterministic CAC based on channel index
+  const cac = 800_000 + (channelIndex * 157_000) % 1_200_000;
   const ltv = revenue / Math.max(conversions, 1);
 
   return {
@@ -287,18 +348,24 @@ export const mockChannelMetrics: ChannelMetric[] = CHANNELS.map(channel => {
   };
 });
 
-// Pipeline Metrics
-export const mockPipelineMetrics: PipelineMetric[] = PIPELINE_STAGES.map(stage => {
+// Pipeline Metrics - Calculated from static students with deterministic averages
+export const mockPipelineMetrics: PipelineMetric[] = PIPELINE_STAGES.map((stage, stageIndex) => {
   const studentsInStage = mockStudents.filter(s => s.stage === stage);
   const count = studentsInStage.length;
   const revenue = studentsInStage.reduce((sum, s) => sum + s.revenue, 0);
+
+  // Deterministic average days in stage
+  const averageDaysInStage = 7 + (stageIndex * 11) % 39;
+
+  // Deterministic conversion rate
+  const conversionRate = 60 + (stageIndex * 7) % 36;
 
   return {
     stage,
     count,
     revenue,
-    averageDaysInStage: getRandomNumber(7, 45),
-    conversionRate: getRandomNumber(60, 95)
+    averageDaysInStage,
+    conversionRate
   };
 });
 
@@ -399,24 +466,34 @@ export const getCityDistribution = () => {
 
 // ============ MARKETING DASHBOARD DATA ============
 
-// Web Metrics (last 30 days)
+// Web Metrics (last 30 days) - Static deterministic data
 export const mockWebMetrics: WebMetric[] = Array.from({ length: 30 }, (_, i) => {
-  const date = new Date();
-  date.setDate(date.getDate() - (29 - i));
+  const date = new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000);
 
-  const visits = getRandomNumber(800, 2000);
+  // Deterministic visits with wave pattern
+  const baseVisits = 1400;
+  const visits = baseVisits + ((i * 173) % 600);
   const uniqueVisitors = Math.floor(visits * 0.7);
-  const pageViews = visits * getRandomNumber(2, 4);
+  const pageViews = visits * (2 + (i % 3));
+
+  // Deterministic bounce rate
+  const bounceRate = 35 + ((i * 11) % 31);
+
+  // Deterministic session duration
+  const avgSessionDuration = 120 + ((i * 19) % 301);
+
+  // Deterministic conversion rate
+  const conversionRate = (2 + ((i * 7) % 7)) / 10;
 
   return {
     date,
     visits,
     uniqueVisitors,
     pageViews,
-    bounceRate: getRandomNumber(35, 65),
-    avgSessionDuration: getRandomNumber(120, 420), // 2-7 minutes in seconds
-    conversionRate: getRandomNumber(2, 8) / 10, // 0.2% - 0.8%
-    source: getRandomElement(WEB_SOURCES)
+    bounceRate,
+    avgSessionDuration,
+    conversionRate,
+    source: WEB_SOURCES[i % WEB_SOURCES.length]
   };
 });
 
@@ -525,7 +602,7 @@ export const getMarketingMetrics = (): MarketingMetrics => {
 
 // ============ ESTUDIANTES DASHBOARD DATA ============
 
-// Demographic Data by Age Range
+// Demographic Data by Age Range - Calculated from static students
 export const mockDemographicData: DemographicData[] = AGE_RANGES.map(ageRange => {
   const studentsInRange = mockStudents.filter(s => s.ageRange === ageRange);
   const count = studentsInRange.length;
@@ -545,22 +622,25 @@ export const mockDemographicData: DemographicData[] = AGE_RANGES.map(ageRange =>
   };
 });
 
-// City Performance Data
-export const mockCityData: CityData[] = CITIES.map(city => {
+// City Performance Data - Calculated from static data with deterministic growth rates
+export const mockCityData: CityData[] = CITIES.map((city, cityIndex) => {
   const cityStudents = mockStudents.filter(s => s.city === city);
   const cityLeads = mockLeads.filter(l => l.city === city);
   const revenue = cityStudents.reduce((sum, s) => sum + s.revenue, 0);
+
+  // Deterministic growth rate
+  const growthRate = (5 + (cityIndex * 13) % 21) / 10; // 0.5% - 2.5%
 
   return {
     city,
     students: cityStudents.length,
     leads: cityLeads.length,
     revenue,
-    growthRate: getRandomNumber(5, 25) / 10 // 0.5% - 2.5%
+    growthRate
   };
 });
 
-// Program Performance
+// Program Performance - Calculated from static students
 export const mockProgramPerformance: ProgramPerformance[] = PROGRAM_TYPES.map(programType => {
   const programStudents = mockStudents.filter(s => s.programType === programType);
   const count = programStudents.length;
@@ -620,16 +700,31 @@ export const mockStudentSuccessMetrics: StudentSuccessMetric[] = [
 
 // ============ ANALYTICS DASHBOARD DATA ============
 
-// Financial Metrics (last 12 months) - Realistic scale
+// Financial Metrics (last 12 months) - Static deterministic data
 export const mockFinancialMetrics: FinancialMetric[] = Array.from({ length: 12 }, (_, i) => {
   const date = new Date();
   date.setMonth(date.getMonth() - (11 - i));
 
-  const revenue = getRandomNumber(180_000_000, 280_000_000); // $45k-$70k USD -> 180M-280M COP
-  const costs = revenue * getRandomNumber(35, 42) / 100; // 35-42% of revenue
+  // Deterministic revenue with trend
+  const baseRevenue = 230_000_000;
+  const trendIncrease = i * 3_000_000;
+  const cyclicVariation = Math.floor(Math.sin(i / 3) * 20_000_000);
+  const revenue = baseRevenue + trendIncrease + cyclicVariation;
+
+  // Deterministic costs (35-42% of revenue)
+  const costPercentage = 35 + ((i * 3) % 8);
+  const costs = Math.floor(revenue * costPercentage / 100);
+
   const grossProfit = revenue - costs;
-  const operatingExpenses = revenue * getRandomNumber(15, 22) / 100; // 15-22% of revenue
+
+  // Deterministic operating expenses (15-22% of revenue)
+  const opexPercentage = 15 + ((i * 5) % 8);
+  const operatingExpenses = Math.floor(revenue * opexPercentage / 100);
+
   const netProfit = grossProfit - operatingExpenses;
+
+  // Deterministic cash flow variance
+  const cashFlowVariance = ((i * 7_654_321) % 30_000_000) - 10_000_000;
 
   return {
     date,
@@ -639,11 +734,11 @@ export const mockFinancialMetrics: FinancialMetric[] = Array.from({ length: 12 }
     margin: (grossProfit / revenue) * 100,
     operatingExpenses,
     netProfit,
-    cashFlow: netProfit + getRandomNumber(-10_000_000, 20_000_000) // some variance
+    cashFlow: netProfit + cashFlowVariance
   };
 });
 
-// Annual Metrics by Month
+// Annual Metrics by Month - Calculated from historical metrics
 export const mockAnnualMetrics: AnnualMetric[] = [
   'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
   'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
@@ -657,7 +752,10 @@ export const mockAnnualMetrics: AnnualMetric[] = [
   const revenue = monthMetrics.reduce((sum, m) => sum + m.revenue, 0);
   const leads = monthMetrics.reduce((sum, m) => sum + m.leads, 0);
   const conversions = monthMetrics.reduce((sum, m) => sum + m.conversions, 0);
-  const costs = revenue * 0.35; // 35% average cost
+  const costs = Math.floor(revenue * 0.35); // 35% average cost
+
+  // Deterministic student count
+  const students = 100 + ((i * 17) % 36);
 
   return {
     month,
@@ -666,7 +764,7 @@ export const mockAnnualMetrics: AnnualMetric[] = [
     profit: revenue - costs,
     leads,
     conversions,
-    students: getRandomNumber(100, 135)
+    students
   };
 });
 
