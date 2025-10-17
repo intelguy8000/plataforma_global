@@ -1,11 +1,12 @@
 # 📊 JGSL Dashboard - Presentación MVP
 
 ## 🔗 Acceso a la Plataforma
-**URL de Producción:** [Insertar URL de Vercel aquí]
+**URL de Producción:** **https://jgsl.vercel.app**
 
 **Acceso:**
 - Usuario: Admin
 - La plataforma es de acceso directo (sin autenticación en MVP)
+- Redirige automáticamente a `/dashboard/overview`
 
 ---
 
