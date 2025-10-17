@@ -1,6 +1,6 @@
-# Dashboard Analytics - Estudiar en el Exterior
+# JGSL Dashboard Analytics
 
-Dashboard analytics completo para gestión de estudiantes, conversiones y métricas de negocio para una empresa EdTech que ayuda a estudiantes colombianos a estudiar en el extranjero.
+Plataforma analytics completa para gestión de estudiantes, conversiones y métricas de negocio para empresas EdTech que ayudan a estudiantes colombianos a estudiar en el extranjero.
 
 ## Características Implementadas
 
@@ -29,7 +29,7 @@ Dashboard analytics completo para gestión de estudiantes, conversiones y métri
 ## Estructura del Proyecto
 
 ```
-plataforma-global/
+jgsl-dashboard/
 ├── app/
 │   ├── dashboard/
 │   │   ├── overview/          # Dashboard principal
@@ -68,7 +68,7 @@ plataforma-global/
 
 1. Navegar al directorio del proyecto:
 ```bash
-cd plataforma-global
+cd jgsl-dashboard
 ```
 
 2. Las dependencias ya están instaladas. Si necesitas reinstalarlas:
@@ -287,9 +287,9 @@ Este es un proyecto demo con datos mockeados. Para implementación en producció
 5. Testing (unit + e2e)
 6. CI/CD pipeline
 
-## Autor
+## JGSL
 
-Dashboard creado para **Estudiar en el Exterior** - Empresa EdTech especializada en ayudar a estudiantes colombianos a estudiar en el extranjero.
+Plataforma desarrollada por **JGSL** - Soluciones de analytics para empresas EdTech especializadas en programas de estudio en el extranjero.
 
 ---
 

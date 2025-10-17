@@ -14,8 +14,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Estudiar en el Exterior - Dashboard Analytics",
-  description: "Dashboard analytics para gestión de estudiantes y conversiones",
+  title: "JGSL - Dashboard Analytics",
+  description: "Plataforma de analytics para gestión de estudiantes y conversiones",
 };
 
 export default function RootLayout({

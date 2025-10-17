@@ -37,7 +37,7 @@ export function Sidebar() {
     <div className="flex h-screen w-64 flex-col border-r bg-background">
       {/* Logo */}
       <div className="flex h-16 items-center border-b px-6">
-        <h1 className="text-xl font-bold text-primary">Estudiar en el Exterior</h1>
+        <h1 className="text-xl font-bold text-primary">JGSL</h1>
       </div>
 
       {/* Navigation */}
@@ -94,7 +94,7 @@ export function Sidebar() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">Admin</p>
-            <p className="text-xs text-muted-foreground truncate">admin@estudiar.com</p>
+            <p className="text-xs text-muted-foreground truncate">admin@jgsl.com</p>
           </div>
         </div>
       </div>
