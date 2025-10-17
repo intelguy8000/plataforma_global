@@ -1,9 +1,11 @@
 export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'converted';
 export type PipelineStage = 'documentation' | 'application' | 'visa' | 'payment' | 'active';
-export type Channel = 'referral' | 'podcast' | 'search' | 'event' | 'linkedin' | 'instagram';
+export type Channel = 'referral' | 'podcast' | 'search' | 'event' | 'linkedin' | 'instagram' | 'facebook' | 'google_ads' | 'whatsapp';
 export type ProgramType = 'english' | 'undergraduate' | 'masters' | 'phd';
-export type Country = 'USA' | 'Canada' | 'UK' | 'Australia' | 'Ireland' | 'New Zealand';
+export type Country = 'USA' | 'Canada' | 'UK' | 'Australia' | 'Ireland' | 'New Zealand' | 'Germany';
 export type City = 'Bogotá' | 'Medellín' | 'Cali' | 'Barranquilla' | 'Cartagena' | 'Bucaramanga' | 'Pereira' | 'Manizales';
+export type AgeRange = '18-22' | '23-27' | '28-35' | '36+';
+export type StudentStatus = 'active' | 'graduated' | 'dropped' | 'on_hold';
 
 export interface Lead {
   id: string;
@@ -20,6 +22,12 @@ export interface Lead {
   lastContactedAt?: Date;
   convertedAt?: Date;
   expectedRevenue: number;
+  age?: number;
+  webSource?: string;
+  firstVisitDate?: Date;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
 }
 
 export interface Student {
@@ -37,6 +45,13 @@ export interface Student {
   startDate: Date;
   expectedGraduationDate: Date;
   lastUpdated: Date;
+  age: number;
+  ageRange: AgeRange;
+  status: StudentStatus;
+  successScore?: number; // 0-100 score
+  graduationStatus?: 'graduated' | 'in_progress';
+  gpa?: number;
+  satisfactionScore?: number; // 1-5 rating
 }
 
 export interface Advisor {
@@ -105,4 +120,113 @@ export interface KPICard {
   change: number; // percentage change
   trend: 'up' | 'down' | 'neutral';
   icon: string;
+}
+
+// Marketing Dashboard Types
+export interface WebMetric {
+  date: Date;
+  visits: number;
+  uniqueVisitors: number;
+  pageViews: number;
+  bounceRate: number;
+  avgSessionDuration: number; // in seconds
+  conversionRate: number;
+  source: string;
+}
+
+export interface MarketingCampaign {
+  id: string;
+  name: string;
+  channel: Channel;
+  investment: number; // COP
+  leads: number;
+  conversions: number;
+  revenue: number; // COP
+  cac: number; // Customer Acquisition Cost in COP
+  roi: number; // Return on Investment percentage
+  startDate: Date;
+  endDate?: Date;
+  status: 'active' | 'paused' | 'completed';
+}
+
+export interface MarketingMetrics {
+  totalInvestment: number;
+  totalLeads: number;
+  totalConversions: number;
+  totalRevenue: number;
+  averageCAC: number;
+  averageLTV: number;
+  overallROI: number;
+  conversionRate: number;
+}
+
+// Estudiantes Dashboard Types
+export interface DemographicData {
+  ageRange: AgeRange;
+  count: number;
+  percentage: number;
+  averageRevenue: number;
+  conversionRate: number;
+}
+
+export interface CityData {
+  city: City;
+  students: number;
+  leads: number;
+  revenue: number;
+  growthRate: number;
+}
+
+export interface ProgramPerformance {
+  programType: ProgramType;
+  students: number;
+  revenue: number;
+  averageRevenue: number;
+  completionRate: number;
+  satisfactionScore: number;
+}
+
+export interface StudentSuccessMetric {
+  metric: string;
+  value: number;
+  benchmark: number;
+  trend: 'up' | 'down' | 'neutral';
+}
+
+// Analytics Dashboard Types
+export interface FinancialMetric {
+  date: Date;
+  revenue: number;
+  costs: number;
+  grossProfit: number;
+  margin: number; // percentage
+  operatingExpenses: number;
+  netProfit: number;
+  cashFlow: number;
+}
+
+export interface AnnualMetric {
+  month: string;
+  revenue: number;
+  costs: number;
+  profit: number;
+  leads: number;
+  conversions: number;
+  students: number;
+}
+
+export interface ConversionFunnel {
+  stage: string;
+  count: number;
+  percentage: number;
+  dropoffRate: number;
+}
+
+export interface ExecutiveKPI {
+  category: string;
+  name: string;
+  value: number;
+  target: number;
+  achievement: number; // percentage
+  trend: 'up' | 'down' | 'neutral';
 }
