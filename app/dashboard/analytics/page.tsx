@@ -4,11 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { DollarSign, TrendingUp, TrendingDown, Target, Activity } from 'lucide-react';
 import { KPICard } from '@/components/dashboard/kpi-card';
 import {
-  mockFinancialMetrics,
-  mockAnnualMetrics,
   mockConversionFunnel,
   mockExecutiveKPIs
 } from '@/lib/data/mock-data';
+import { getLastNMonths } from '@/lib/data/historical-data';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import {
   LineChart,
   Line,
@@ -28,36 +29,38 @@ import { formatCOP } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 
 export default function AnalyticsPage() {
-  // Get latest financial data
-  const avgMargin = mockFinancialMetrics.reduce((sum, f) => sum + f.margin, 0) / mockFinancialMetrics.length;
+  // Get historical data from static source
+  const last12Months = getLastNMonths(12);
+  const last6Months = getLastNMonths(6);
 
-  // Annual summary
-  const yearToDateRevenue = mockAnnualMetrics.reduce((sum, m) => sum + m.revenue, 0);
-  const yearToDateProfit = mockAnnualMetrics.reduce((sum, m) => sum + m.profit, 0);
-  const yearToDateLeads = mockAnnualMetrics.reduce((sum, m) => sum + m.leads, 0);
+  // Calculate averages and totals
+  const avgMargin = last12Months.reduce((sum, m) => sum + m.marginPercentage, 0) / last12Months.length;
+
+  // Year to date summary
+  const yearToDateRevenue = last12Months.reduce((sum, m) => sum + m.revenue, 0);
+  const yearToDateProfit = last12Months.reduce((sum, m) => sum + m.netProfit, 0);
+  const yearToDateLeads = last12Months.reduce((sum, m) => sum + m.leads, 0);
 
   // Format annual data for chart
-  const annualChartData = mockAnnualMetrics.map(m => ({
-    month: m.month,
+  const annualChartData = last12Months.map(m => ({
+    month: format(m.date, 'MMM', { locale: es }),
     revenue: m.revenue / 1000000, // In millions
     costs: m.costs / 1000000,
-    profit: m.profit / 1000000,
-    margin: ((m.profit / m.revenue) * 100)
+    profit: m.netProfit / 1000000,
+    margin: m.marginPercentage
   }));
 
   // Format financial metrics for trend
-  const financialTrendData = mockFinancialMetrics.slice(-6).map(f => ({
-    month: f.date.toLocaleDateString('es-ES', { month: 'short' }),
-    revenue: f.revenue / 1000000,
-    profit: f.netProfit / 1000000,
-    margin: f.margin
+  const financialTrendData = last6Months.map(m => ({
+    month: format(m.date, 'MMM', { locale: es }),
+    revenue: m.revenue / 1000000,
+    profit: m.netProfit / 1000000,
+    margin: m.marginPercentage
   }));
 
   // Revenue projections - Historical + Forecast
-  const currentMonth = new Date().getMonth();
-  const historicalMonths = mockAnnualMetrics.slice(0, currentMonth + 1);
   const avgGrowthRate = 0.08; // 8% monthly growth
-  const lastRevenue = historicalMonths[historicalMonths.length - 1]?.revenue || 2400000000;
+  const lastRevenue = last12Months[last12Months.length - 1].revenue;
 
   const projectionMonths = ['Nov', 'Dic'];
   const projectedData = projectionMonths.map((month, index) => ({
@@ -68,11 +71,11 @@ export default function AnalyticsPage() {
   }));
 
   const revenueProjectionData = [
-    ...historicalMonths.map(m => ({
-      month: m.month,
+    ...last12Months.map(m => ({
+      month: format(m.date, 'MMM', { locale: es }),
       revenue: m.revenue / 1000000,
       isProjection: false,
-      marginPercentage: (m.profit / m.revenue) * 100
+      marginPercentage: m.marginPercentage
     })),
     ...projectedData
   ];
@@ -168,7 +171,7 @@ export default function AnalyticsPage() {
       {/* Revenue Projections */}
       <Card>
         <CardHeader>
-          <CardTitle>Proyección de Revenue 2024</CardTitle>
+          <CardTitle>Proyección de Revenue 2025</CardTitle>
           <CardDescription>Histórico + Proyección próximos meses (8% crecimiento mensual)</CardDescription>
         </CardHeader>
         <CardContent>
@@ -372,40 +375,34 @@ export default function AnalyticsPage() {
                 <TableHead className="text-right">Revenue</TableHead>
                 <TableHead className="text-right">Costos</TableHead>
                 <TableHead className="text-right">Beneficio Bruto</TableHead>
-                <TableHead className="text-right">Gastos Op.</TableHead>
                 <TableHead className="text-right">Beneficio Neto</TableHead>
                 <TableHead className="text-right">Margen</TableHead>
-                <TableHead className="text-right">Cash Flow</TableHead>
+                <TableHead className="text-right">CAC</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockFinancialMetrics.map((finance, index) => {
-                const month = finance.date.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+              {last12Months.map((m, index) => {
+                const month = format(m.date, 'MMM yyyy', { locale: es });
                 return (
                   <TableRow key={index}>
                     <TableCell className="font-medium capitalize">{month}</TableCell>
                     <TableCell className="text-right font-medium text-green-600">
-                      {formatCOP(finance.revenue)}
+                      {formatCOP(m.revenue)}
                     </TableCell>
                     <TableCell className="text-right text-red-600">
-                      {formatCOP(finance.costs)}
+                      {formatCOP(m.costs)}
                     </TableCell>
-                    <TableCell className="text-right">{formatCOP(finance.grossProfit)}</TableCell>
-                    <TableCell className="text-right text-red-600">
-                      {formatCOP(finance.operatingExpenses)}
-                    </TableCell>
+                    <TableCell className="text-right">{formatCOP(m.grossProfit)}</TableCell>
                     <TableCell className="text-right font-medium text-green-600">
-                      {formatCOP(finance.netProfit)}
+                      {formatCOP(m.netProfit)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Badge variant={finance.margin > 40 ? 'default' : 'secondary'}>
-                        {finance.margin.toFixed(1)}%
+                      <Badge variant={m.marginPercentage > 40 ? 'default' : 'secondary'}>
+                        {m.marginPercentage.toFixed(1)}%
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <span className={finance.cashFlow > 0 ? 'text-green-600' : 'text-red-600'}>
-                        {formatCOP(finance.cashFlow)}
-                      </span>
+                      {formatCOP(m.cac)}
                     </TableCell>
                   </TableRow>
                 );
@@ -436,28 +433,27 @@ export default function AnalyticsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockAnnualMetrics.map((annual) => {
-                const margin = (annual.profit / annual.revenue) * 100;
+              {last12Months.map((m, index) => {
                 return (
-                  <TableRow key={annual.month}>
-                    <TableCell className="font-medium">{annual.month}</TableCell>
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">{format(m.date, 'MMMM', { locale: es })}</TableCell>
                     <TableCell className="text-right font-medium text-green-600">
-                      {formatCOP(annual.revenue)}
+                      {formatCOP(m.revenue)}
                     </TableCell>
                     <TableCell className="text-right text-red-600">
-                      {formatCOP(annual.costs)}
+                      {formatCOP(m.costs)}
                     </TableCell>
                     <TableCell className="text-right font-medium text-green-600">
-                      {formatCOP(annual.profit)}
+                      {formatCOP(m.netProfit)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Badge variant={margin > 60 ? 'default' : 'secondary'}>
-                        {margin.toFixed(1)}%
+                      <Badge variant={m.marginPercentage > 60 ? 'default' : 'secondary'}>
+                        {m.marginPercentage.toFixed(1)}%
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">{annual.leads}</TableCell>
-                    <TableCell className="text-right">{annual.conversions}</TableCell>
-                    <TableCell className="text-right">{annual.students}</TableCell>
+                    <TableCell className="text-right">{m.leads}</TableCell>
+                    <TableCell className="text-right">{m.conversions}</TableCell>
+                    <TableCell className="text-right">{m.activeStudents}</TableCell>
                   </TableRow>
                 );
               })}
