@@ -72,8 +72,13 @@ export function ChatWidget() {
     const prevMonthRevenue = Math.round(metrics.revenue / 1.12); // 12% growth
     const prevMonthLeads = Math.round(metrics.newLeads / 1.082); // 8.2% growth
 
-    // Revenue queries
-    if (lowerQuery.includes('revenue') || lowerQuery.includes('ingresos')) {
+    // Revenue/Sales queries
+    if (lowerQuery.includes('revenue') ||
+        lowerQuery.includes('ingresos') ||
+        lowerQuery.includes('vendido') ||
+        lowerQuery.includes('ventas') ||
+        lowerQuery.includes('facturado') ||
+        lowerQuery.includes('facturación')) {
       if (lowerQuery.includes('anterior') || lowerQuery.includes('pasado') || lowerQuery.includes('vs') || lowerQuery.includes('comparar')) {
         const growth = ((metrics.revenue - prevMonthRevenue) / prevMonthRevenue * 100).toFixed(1);
         const difference = metrics.revenue - prevMonthRevenue;
@@ -83,7 +88,7 @@ export function ChatWidget() {
         };
       }
       return {
-        response: `Revenue actual: $${metrics.revenue.toLocaleString('es-CO')} COP (+12% vs mes anterior)`,
+        response: `Revenue este mes: $${metrics.revenue.toLocaleString('es-CO')} COP\n\n📈 Crecimiento: +12% vs mes anterior\n💰 Conversiones: ${metrics.conversions.toLocaleString('es-CO')}`,
         newContext: { lastMetric: 'revenue', lastValue: metrics.revenue }
       };
     }
@@ -148,8 +153,9 @@ export function ChatWidget() {
       };
     }
 
-    // Suggestions/help
-    if (lowerQuery.includes('sugerencia') || lowerQuery.includes('cerrar') || lowerQuery.includes('mejorar') || lowerQuery.includes('ventas')) {
+    // Suggestions/help (only if not asking about revenue/sales)
+    if ((lowerQuery.includes('sugerencia') || lowerQuery.includes('cerrar más') || lowerQuery.includes('mejorar')) &&
+        !lowerQuery.includes('vendido') && !lowerQuery.includes('ventas') && !lowerQuery.includes('cuánto')) {
       const qualifiedLeads = mockLeads.filter(l => l.status === 'qualified').length;
       return {
         response: `💡 Sugerencias para cerrar más en octubre:\n\n✅ Enfócate en los ${qualifiedLeads.toLocaleString('es-CO')} leads calificados\n✅ Sigue el proceso de los top performers\n✅ Prioriza canales: Referral (32% conversión)`,
