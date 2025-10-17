@@ -7,12 +7,14 @@ import {
   mockWebMetrics,
   mockMarketingCampaigns,
   getMarketingMetrics,
-  mockChannelMetrics
+  mockChannelMetrics,
+  mockLeads
 } from '@/lib/data/mock-data';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { formatCOP } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
 
 export default function MarketingPage() {
   const marketingMetrics = getMarketingMetrics();
@@ -39,6 +41,21 @@ export default function MarketingPage() {
     roi: c.roi / 100, // Convert to percentage decimal
     investment: c.investment / 1000000 // In millions for display
   }));
+
+  // Sales Funnel Data
+  const totalVisitors = 45000;
+  const totalLeads = mockLeads.length;
+  const contactedLeads = mockLeads.filter(l => l.status === 'contacted' || l.status === 'qualified' || l.status === 'converted').length;
+  const qualifiedLeads = mockLeads.filter(l => l.status === 'qualified' || l.status === 'converted').length;
+  const convertedLeads = mockLeads.filter(l => l.status === 'converted').length;
+
+  const funnelStages = [
+    { stage: 'Visitantes Web', count: totalVisitors, percentage: 100 },
+    { stage: 'Leads Generados', count: totalLeads, percentage: (totalLeads / totalVisitors) * 100 },
+    { stage: 'Leads Contactados', count: contactedLeads, percentage: (contactedLeads / totalVisitors) * 100 },
+    { stage: 'Leads Calificados', count: qualifiedLeads, percentage: (qualifiedLeads / totalVisitors) * 100 },
+    { stage: 'Conversiones', count: convertedLeads, percentage: (convertedLeads / totalVisitors) * 100 }
+  ];
 
   return (
     <div className="space-y-6">
@@ -122,15 +139,47 @@ export default function MarketingPage() {
         </CardContent>
       </Card>
 
+      {/* Sales Funnel */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Embudo de Conversión (Sales Funnel)</CardTitle>
+          <CardDescription>Del visitante web al cliente convertido</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {funnelStages.map((funnel, index) => {
+              const dropoff = index > 0 ? ((funnelStages[index - 1].count - funnel.count) / funnelStages[index - 1].count) * 100 : 0;
+              return (
+                <div key={index} className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium">{funnel.stage}</span>
+                    <div className="flex items-center gap-4">
+                      <span className="text-muted-foreground">{funnel.count.toLocaleString('es-CO')}</span>
+                      <Badge variant="outline">{funnel.percentage.toFixed(2)}%</Badge>
+                    </div>
+                  </div>
+                  <Progress value={funnel.percentage} className="h-3" />
+                  {index > 0 && dropoff > 0 && (
+                    <p className="text-xs text-red-500">
+                      Drop-off: {dropoff.toFixed(1)}% ({(funnelStages[index - 1].count - funnel.count).toLocaleString('es-CO')} perdidos)
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-4 md:grid-cols-2">
-        {/* Channel Distribution */}
+        {/* Channel Distribution - Donut Chart */}
         <Card>
           <CardHeader>
             <CardTitle>Distribución de Leads por Canal</CardTitle>
             <CardDescription>Total: {marketingMetrics.totalLeads} leads</CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center">
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={400}>
               <PieChart>
                 <Pie
                   data={channelDistribution}
@@ -138,7 +187,8 @@ export default function MarketingPage() {
                   cy="50%"
                   labelLine={false}
                   label={(entry) => `${entry.name} (${entry.value})`}
-                  outerRadius={80}
+                  outerRadius={140}
+                  innerRadius={90}
                   fill="#8884d8"
                   dataKey="value"
                 >

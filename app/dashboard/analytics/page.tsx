@@ -19,7 +19,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   ComposedChart,
-  Legend
+  Legend,
+  Cell
 } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -51,6 +52,30 @@ export default function AnalyticsPage() {
     profit: f.netProfit / 1000000,
     margin: f.margin
   }));
+
+  // Revenue projections - Historical + Forecast
+  const currentMonth = new Date().getMonth();
+  const historicalMonths = mockAnnualMetrics.slice(0, currentMonth + 1);
+  const avgGrowthRate = 0.08; // 8% monthly growth
+  const lastRevenue = historicalMonths[historicalMonths.length - 1]?.revenue || 2400000000;
+
+  const projectionMonths = ['Nov', 'Dic'];
+  const projectedData = projectionMonths.map((month, index) => ({
+    month,
+    revenue: (lastRevenue * Math.pow(1 + avgGrowthRate, index + 1)) / 1000000,
+    isProjection: true,
+    marginPercentage: avgMargin
+  }));
+
+  const revenueProjectionData = [
+    ...historicalMonths.map(m => ({
+      month: m.month,
+      revenue: m.revenue / 1000000,
+      isProjection: false,
+      marginPercentage: (m.profit / m.revenue) * 100
+    })),
+    ...projectedData
+  ];
 
   // KPI categories
   const kpiByCategory = {
@@ -137,6 +162,79 @@ export default function AnalyticsPage() {
               <Line yAxisId="right" type="monotone" dataKey="margin" stroke="#10B981" strokeWidth={3} name="Margen %" />
             </ComposedChart>
           </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Revenue Projections */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Proyección de Revenue 2024</CardTitle>
+          <CardDescription>Histórico + Proyección próximos meses (8% crecimiento mensual)</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={400}>
+            <ComposedChart data={revenueProjectionData}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis dataKey="month" className="text-xs" />
+              <YAxis
+                yAxisId="left"
+                className="text-xs"
+                tickFormatter={(value) => `$${value}M`}
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                className="text-xs"
+                tickFormatter={(value) => `${value}%`}
+              />
+              <Tooltip
+                formatter={(value: number, name: string) => {
+                  if (name === 'marginPercentage') return [`${value.toFixed(1)}%`, '% Margen'];
+                  return [`$${value.toFixed(0)}M`, name === 'revenue' ? 'Revenue' : 'Proyectado'];
+                }}
+                contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
+              />
+              <Legend />
+              <Bar
+                yAxisId="left"
+                dataKey="revenue"
+                name="Revenue"
+                radius={[8, 8, 0, 0]}
+              >
+                {revenueProjectionData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.isProjection ? '#93C5FD' : '#3B82F6'} />
+                ))}
+              </Bar>
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="marginPercentage"
+                stroke="#10B981"
+                strokeWidth={2}
+                name="% Margen"
+                dot={{ fill: '#10B981', r: 4 }}
+                strokeDasharray="0"
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+          <div className="mt-4 flex items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-blue-500 rounded"></div>
+              <span>Histórico</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-blue-500 opacity-50 rounded"></div>
+              <span>Proyección</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-0.5 bg-green-500"></div>
+              <span>% Margen Real</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-0.5 bg-green-500 border-dashed border-t-2"></div>
+              <span>% Margen Proyectado</span>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
