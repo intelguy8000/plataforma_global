@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { mockStudents, mockPipelineMetrics, getCurrentMonthMetrics } from '@/lib/data/mock-data';
 import { PipelineStage } from '@/types';
 import { DollarSign, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatCOP } from '@/lib/utils';
 
 const STAGE_CONFIG = {
   documentation: {
@@ -76,7 +76,7 @@ export default function SalesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${(totalRevenue / 1000).toFixed(0)}k
+              {formatCOP(totalRevenue)}
             </div>
             <p className="text-xs text-muted-foreground">
               {mockStudents.length} estudiantes
@@ -91,7 +91,7 @@ export default function SalesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${(projectedCloseMonth / 1000).toFixed(0)}k
+              {formatCOP(projectedCloseMonth)}
             </div>
             <p className="text-xs text-muted-foreground">
               {studentsByStage.payment.length} en pago
@@ -182,7 +182,7 @@ export default function SalesPage() {
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      ${(stageRevenue / 1000).toFixed(0)}k total
+                      {formatCOP(stageRevenue)} total
                     </p>
                   </div>
 
@@ -210,7 +210,7 @@ export default function SalesPage() {
                             <div className="flex items-center justify-between">
                               <p className="text-xs text-muted-foreground">{student.city}</p>
                               <p className="text-sm font-semibold text-green-600">
-                                ${(student.revenue / 1000).toFixed(1)}k
+                                {formatCOP(student.revenue)}
                               </p>
                             </div>
                             {student.university && (

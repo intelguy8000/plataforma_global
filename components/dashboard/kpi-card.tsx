@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Minus, LucideIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatCOP } from '@/lib/utils';
 
 interface KPICardProps {
   title: string;
@@ -19,11 +19,11 @@ export function KPICard({ title, value, change, icon: Icon, format = 'number' }:
 
     switch (format) {
       case 'currency':
-        return `$${val.toLocaleString('en-US')}`;
+        return formatCOP(val);
       case 'percentage':
         return `${val.toFixed(1)}%`;
       default:
-        return val.toLocaleString('en-US');
+        return val.toLocaleString('es-CO');
     }
   };
 

@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { formatCOP } from '@/lib/utils';
 
 export default function OverviewPage() {
   const currentMetrics = getCurrentMonthMetrics();
@@ -34,7 +35,7 @@ export default function OverviewPage() {
            metric.stage === 'visa' ? 'Visa' :
            metric.stage === 'payment' ? 'Pago' : 'Activo',
     count: metric.count,
-    revenue: metric.revenue / 1000 // in thousands
+    revenue: metric.revenue / 1000000 // in millions for chart
   }));
 
   return (
@@ -96,10 +97,10 @@ export default function OverviewPage() {
               />
               <YAxis
                 className="text-xs"
-                tickFormatter={(value) => `$${value / 1000}k`}
+                tickFormatter={(value) => `$${(value / 1000000).toFixed(0)}M`}
               />
               <Tooltip
-                formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+                formatter={(value: number) => [formatCOP(value), 'Revenue']}
                 labelFormatter={(label) => `Día ${label}`}
                 contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
               />
@@ -130,7 +131,7 @@ export default function OverviewPage() {
               <YAxis className="text-xs" />
               <Tooltip
                 formatter={(value: number, name: string) => [
-                  name === 'count' ? value : `$${value}k`,
+                  name === 'count' ? value : `$${value.toFixed(1)}M`,
                   name === 'count' ? 'Estudiantes' : 'Revenue'
                 ]}
                 contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
@@ -177,7 +178,7 @@ export default function OverviewPage() {
                       <Badge variant="secondary">{advisor.conversionsCount}</Badge>
                     </TableCell>
                     <TableCell className="text-right font-medium">
-                      ${(advisor.revenue / 1000).toFixed(0)}k
+                      {formatCOP(advisor.revenue)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -218,7 +219,7 @@ export default function OverviewPage() {
                   </div>
                   {activity.amount && (
                     <Badge variant="outline" className="text-green-600">
-                      ${activity.amount.toLocaleString()}
+                      {formatCOP(activity.amount)}
                     </Badge>
                   )}
                 </div>

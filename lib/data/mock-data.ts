@@ -53,7 +53,7 @@ const UNIVERSITIES = [
   'University of Auckland', 'UCLA', 'UC Berkeley', 'Yale University', 'Princeton University'
 ];
 
-// Generate Advisors
+// Generate Advisors (Revenue in COP - tasa $4,000 COP/USD)
 export const mockAdvisors: Advisor[] = [
   {
     id: 'adv-1',
@@ -63,7 +63,7 @@ export const mockAdvisors: Advisor[] = [
     leadsCount: 78,
     conversionsCount: 23,
     conversionRate: 29.5,
-    revenue: 345000,
+    revenue: 1380000000, // $345k USD -> $1,380M COP
     activeStudents: 18,
     joinedAt: new Date('2023-01-15')
   },
@@ -75,7 +75,7 @@ export const mockAdvisors: Advisor[] = [
     leadsCount: 65,
     conversionsCount: 19,
     conversionRate: 29.2,
-    revenue: 285000,
+    revenue: 1140000000, // $285k USD -> $1,140M COP
     activeStudents: 15,
     joinedAt: new Date('2023-02-20')
   },
@@ -87,7 +87,7 @@ export const mockAdvisors: Advisor[] = [
     leadsCount: 92,
     conversionsCount: 26,
     conversionRate: 28.3,
-    revenue: 390000,
+    revenue: 1560000000, // $390k USD -> $1,560M COP
     activeStudents: 21,
     joinedAt: new Date('2022-11-10')
   },
@@ -99,7 +99,7 @@ export const mockAdvisors: Advisor[] = [
     leadsCount: 55,
     conversionsCount: 14,
     conversionRate: 25.5,
-    revenue: 210000,
+    revenue: 840000000, // $210k USD -> $840M COP
     activeStudents: 11,
     joinedAt: new Date('2023-04-05')
   },
@@ -111,7 +111,7 @@ export const mockAdvisors: Advisor[] = [
     leadsCount: 70,
     conversionsCount: 21,
     conversionRate: 30.0,
-    revenue: 315000,
+    revenue: 1260000000, // $315k USD -> $1,260M COP
     activeStudents: 17,
     joinedAt: new Date('2023-03-12')
   },
@@ -123,7 +123,7 @@ export const mockAdvisors: Advisor[] = [
     leadsCount: 48,
     conversionsCount: 12,
     conversionRate: 25.0,
-    revenue: 180000,
+    revenue: 720000000, // $180k USD -> $720M COP
     activeStudents: 9,
     joinedAt: new Date('2023-05-18')
   },
@@ -135,7 +135,7 @@ export const mockAdvisors: Advisor[] = [
     leadsCount: 58,
     conversionsCount: 17,
     conversionRate: 29.3,
-    revenue: 255000,
+    revenue: 1020000000, // $255k USD -> $1,020M COP
     activeStudents: 14,
     joinedAt: new Date('2023-06-22')
   },
@@ -147,7 +147,7 @@ export const mockAdvisors: Advisor[] = [
     leadsCount: 34,
     conversionsCount: 8,
     conversionRate: 23.5,
-    revenue: 120000,
+    revenue: 480000000, // $120k USD -> $480M COP
     activeStudents: 6,
     joinedAt: new Date('2023-08-01')
   }
@@ -174,7 +174,7 @@ const generateLead = (index: number): Lead => {
     createdAt,
     lastContactedAt: status !== 'new' ? new Date(createdAt.getTime() + getRandomNumber(1, 7) * 24 * 60 * 60 * 1000) : undefined,
     convertedAt: status === 'converted' ? new Date(createdAt.getTime() + getRandomNumber(14, 60) * 24 * 60 * 60 * 1000) : undefined,
-    expectedRevenue: getRandomNumber(8000, 25000)
+    expectedRevenue: getRandomNumber(32000000, 100000000) // $8k-$25k USD -> $32M-$100M COP
   };
 };
 
@@ -206,7 +206,7 @@ export const mockHistoricalMetrics: MetricData[] = Array.from({ length: 90 }, (_
 
   return {
     date,
-    revenue: getRandomNumber(15000, 45000),
+    revenue: getRandomNumber(60000000, 180000000), // $15k-$45k USD -> $60M-$180M COP
     leads: getRandomNumber(3, 12),
     conversions: getRandomNumber(0, 3),
     activeStudents: 120 + getRandomNumber(-5, 5)
@@ -224,7 +224,7 @@ export const mockChannelMetrics: ChannelMetric[] = CHANNELS.map(channel => {
     .filter(l => l.channel === channel && l.status === 'converted')
     .reduce((sum, l) => sum + l.expectedRevenue, 0);
 
-  const cac = getRandomNumber(800, 2500);
+  const cac = getRandomNumber(3200000, 10000000); // $800-$2,500 USD -> $3.2M-$10M COP
   const ltv = revenue / Math.max(conversions, 1);
 
   return {
@@ -263,7 +263,7 @@ export const mockActivities: Activity[] = [
     studentName: 'María González',
     advisorName: 'Patricia Gómez',
     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    amount: 15000
+    amount: 60000000 // $15k USD -> $60M COP
   },
   {
     id: 'act-2',
@@ -291,7 +291,7 @@ export const mockActivities: Activity[] = [
     studentName: 'Luis Mendoza',
     advisorName: 'Valentina Torres',
     timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000),
-    amount: 8000
+    amount: 32000000 // $8k USD -> $32M COP
   },
   {
     id: 'act-5',
@@ -301,7 +301,7 @@ export const mockActivities: Activity[] = [
     studentName: 'Valentina Silva',
     advisorName: 'Andrés Silva',
     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    amount: 18000
+    amount: 72000000 // $18k USD -> $72M COP
   },
   {
     id: 'act-6',
