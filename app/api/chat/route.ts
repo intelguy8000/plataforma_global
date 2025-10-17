@@ -97,16 +97,48 @@ INSTRUCCIONES:
 1. Responde en español colombiano, de forma profesional pero cercana
 2. Usa formato claro con emojis cuando sea apropiado
 3. Para cifras en COP, usa puntos como separadores de miles (ej: $240.000.000)
-4. Sé conciso pero completo (máximo 5-6 líneas)
+4. Sé conciso pero completo (máximo 5-6 líneas para respuestas simples, más largo para reportes)
 5. Cuando te pregunten por tendencias o comparaciones históricas, usa los datos de los últimos 12/24 meses
 6. Si preguntan "cómo van las ventas", "cuánto hemos vendido", etc. → habla del revenue y muestra el crecimiento
 7. Da insights y sugerencias cuando sea relevante basándote en tendencias históricas
 8. Si no tienes un dato específico, ofrece los datos relacionados que sí tienes
 9. Tenemos 24 meses de histórico (Nov 2022 - Oct 2024) con temporadas altas en Ene-Mar (matriculas año nuevo) y Jul-Ago (programas de verano)
 
+📋 GENERACIÓN DE REPORTES:
+Puedes generar reportes detallados cuando te lo soliciten. Tipos de reportes disponibles:
+
+1. **Reporte Ejecutivo** (mensual/trimestral/anual):
+   - Resumen de revenue y crecimiento
+   - KPIs principales
+   - Top asesores y canales
+   - Recomendaciones estratégicas
+
+2. **Reporte de Campañas**:
+   - Performance de cada campaña
+   - ROI y CAC por canal
+   - Comparación de efectividad
+   - Recomendaciones de inversión
+
+3. **Reporte de Tendencias**:
+   - Análisis histórico de 12/24 meses
+   - Patrones estacionales
+   - Proyecciones
+   - Oportunidades de crecimiento
+
+4. **Reporte de Asesores**:
+   - Performance individual
+   - Comparación con el equipo
+   - Leads y conversiones
+   - Áreas de mejora
+
+Cuando generes un reporte, usa estructura clara con secciones, bullets y formato profesional.
+
 Ejemplos de buen formato:
 - "Revenue Octubre 2024: $240.000.000 COP\\n\\n📈 Crecimiento MoM: +5.2%\\n📊 YoY: +18.5%"
-- "🏆 Top asesor del mes: Claudia Ramírez con $52.000.000 COP (14.1% conversión)"`;
+- "🏆 Top asesor del mes: Claudia Ramírez con $52.000.000 COP (14.1% conversión)"
+
+Para reportes usa formato como:
+"📊 REPORTE EJECUTIVO - OCTUBRE 2024\\n\\n💰 REVENUE:\\n- Mes actual: $X COP (+Y%)\\n- Trimestre: $X COP\\n\\n🎯 PERFORMANCE:\\n[detalles]\\n\\n📈 INSIGHTS:\\n[análisis]\\n\\n💡 RECOMENDACIONES:\\n[sugerencias]"`;
 
     // Build messages array with conversation history
     const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
@@ -126,7 +158,7 @@ Ejemplos de buen formato:
       model: 'gpt-4o-mini', // Cheaper and faster than gpt-4
       messages,
       temperature: 0.7,
-      max_tokens: 300,
+      max_tokens: 800, // Increased for report generation
     });
 
     const aiResponse = completion.choices[0].message.content;

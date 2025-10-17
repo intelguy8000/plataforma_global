@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,13 +20,23 @@ export function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: '👋 Hola! Soy tu asistente de analytics interno. Puedo ayudarte con métricas del dashboard o información sobre nuestros servicios. ¿Qué necesitas?',
+      text: '👋 Hola! Soy tu asistente de analytics interno.\n\nPuedo ayudarte con:\n• Métricas y KPIs del negocio\n• Análisis de tendencias históricas\n• Generar reportes ejecutivos\n• Info sobre servicios y operaciones\n\n¿Qué necesitas?',
       sender: 'ai',
       timestamp: new Date()
     }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading]);
 
   const handleSend = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -94,7 +104,7 @@ export function ChatWidget() {
     setMessages([
       {
         id: '1',
-        text: '👋 Hola! Soy tu asistente de analytics interno. Puedo ayudarte con métricas del dashboard o información sobre nuestros servicios. ¿Qué necesitas?',
+        text: '👋 Hola! Soy tu asistente de analytics interno.\n\nPuedo ayudarte con:\n• Métricas y KPIs del negocio\n• Análisis de tendencias históricas\n• Generar reportes ejecutivos\n• Info sobre servicios y operaciones\n\n¿Qué necesitas?',
         sender: 'ai',
         timestamp: new Date()
       }
@@ -182,6 +192,8 @@ export function ChatWidget() {
                   </div>
                 </div>
               )}
+              {/* Scroll anchor */}
+              <div ref={messagesEndRef} />
             </div>
           </ScrollArea>
 
