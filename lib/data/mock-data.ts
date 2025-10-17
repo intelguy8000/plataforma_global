@@ -81,7 +81,8 @@ const UNIVERSITIES = [
   'University of Auckland', 'UCLA', 'UC Berkeley', 'Yale University', 'Princeton University'
 ];
 
-// Generate Advisors (Revenue in COP - tasa $4,000 COP/USD)
+// Generate Advisors (Realistic scale - $60k USD/month = 240M COP/month for all advisors)
+// Each advisor handles ~62 leads/month, ~7-8 conversions/month
 export const mockAdvisors: Advisor[] = [
   {
     id: 'adv-1',
@@ -89,10 +90,10 @@ export const mockAdvisors: Advisor[] = [
     email: 'patricia.gomez@estudiarenelexterior.com',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Patricia',
     leadsCount: 78,
-    conversionsCount: 23,
-    conversionRate: 29.5,
-    revenue: 1380000000, // $345k USD -> $1,380M COP
-    activeStudents: 18,
+    conversionsCount: 11,
+    conversionRate: 14.1,
+    revenue: 44_000_000, // ~$11k USD per month
+    activeStudents: 9,
     joinedAt: new Date('2023-01-15')
   },
   {
@@ -101,10 +102,10 @@ export const mockAdvisors: Advisor[] = [
     email: 'roberto.martinez@estudiarenelexterior.com',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roberto',
     leadsCount: 65,
-    conversionsCount: 19,
-    conversionRate: 29.2,
-    revenue: 1140000000, // $285k USD -> $1,140M COP
-    activeStudents: 15,
+    conversionsCount: 9,
+    conversionRate: 13.8,
+    revenue: 36_000_000, // ~$9k USD
+    activeStudents: 7,
     joinedAt: new Date('2023-02-20')
   },
   {
@@ -113,10 +114,10 @@ export const mockAdvisors: Advisor[] = [
     email: 'claudia.ramirez@estudiarenelexterior.com',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Claudia',
     leadsCount: 92,
-    conversionsCount: 26,
-    conversionRate: 28.3,
-    revenue: 1560000000, // $390k USD -> $1,560M COP
-    activeStudents: 21,
+    conversionsCount: 13,
+    conversionRate: 14.1,
+    revenue: 52_000_000, // ~$13k USD
+    activeStudents: 11,
     joinedAt: new Date('2022-11-10')
   },
   {
@@ -125,10 +126,10 @@ export const mockAdvisors: Advisor[] = [
     email: 'andres.silva@estudiarenelexterior.com',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Andres',
     leadsCount: 55,
-    conversionsCount: 14,
-    conversionRate: 25.5,
-    revenue: 840000000, // $210k USD -> $840M COP
-    activeStudents: 11,
+    conversionsCount: 7,
+    conversionRate: 12.7,
+    revenue: 28_000_000, // ~$7k USD
+    activeStudents: 5,
     joinedAt: new Date('2023-04-05')
   },
   {
@@ -137,10 +138,10 @@ export const mockAdvisors: Advisor[] = [
     email: 'valentina.torres@estudiarenelexterior.com',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Valentina',
     leadsCount: 70,
-    conversionsCount: 21,
-    conversionRate: 30.0,
-    revenue: 1260000000, // $315k USD -> $1,260M COP
-    activeStudents: 17,
+    conversionsCount: 10,
+    conversionRate: 14.3,
+    revenue: 40_000_000, // ~$10k USD
+    activeStudents: 8,
     joinedAt: new Date('2023-03-12')
   },
   {
@@ -149,10 +150,10 @@ export const mockAdvisors: Advisor[] = [
     email: 'daniel.mendoza@estudiarenelexterior.com',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Daniel',
     leadsCount: 48,
-    conversionsCount: 12,
-    conversionRate: 25.0,
-    revenue: 720000000, // $180k USD -> $720M COP
-    activeStudents: 9,
+    conversionsCount: 6,
+    conversionRate: 12.5,
+    revenue: 24_000_000, // ~$6k USD
+    activeStudents: 5,
     joinedAt: new Date('2023-05-18')
   },
   {
@@ -161,10 +162,10 @@ export const mockAdvisors: Advisor[] = [
     email: 'carolina.lopez@estudiarenelexterior.com',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carolina',
     leadsCount: 58,
-    conversionsCount: 17,
-    conversionRate: 29.3,
-    revenue: 1020000000, // $255k USD -> $1,020M COP
-    activeStudents: 14,
+    conversionsCount: 8,
+    conversionRate: 13.8,
+    revenue: 32_000_000, // ~$8k USD
+    activeStudents: 7,
     joinedAt: new Date('2023-06-22')
   },
   {
@@ -173,10 +174,10 @@ export const mockAdvisors: Advisor[] = [
     email: 'sebastian.vargas@estudiarenelexterior.com',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sebastian',
     leadsCount: 34,
-    conversionsCount: 8,
-    conversionRate: 23.5,
-    revenue: 480000000, // $120k USD -> $480M COP
-    activeStudents: 6,
+    conversionsCount: 4,
+    conversionRate: 11.8,
+    revenue: 16_000_000, // ~$4k USD
+    activeStudents: 3,
     joinedAt: new Date('2023-08-01')
   }
 ];
@@ -203,7 +204,7 @@ const generateLead = (index: number): Lead => {
     createdAt,
     lastContactedAt: status !== 'new' ? new Date(createdAt.getTime() + getRandomNumber(1, 7) * 24 * 60 * 60 * 1000) : undefined,
     convertedAt: status === 'converted' ? new Date(createdAt.getTime() + getRandomNumber(14, 60) * 24 * 60 * 60 * 1000) : undefined,
-    expectedRevenue: getRandomNumber(32000000, 100000000), // $8k-$25k USD -> $32M-$100M COP
+    expectedRevenue: getRandomNumber(2_000_000, 8_000_000), // $500-$2k USD -> 2M-8M COP (avg ~4M)
     age: getRandomNumber(18, 45),
     webSource: getRandomElement(WEB_SOURCES),
     firstVisitDate,
@@ -254,10 +255,10 @@ export const mockHistoricalMetrics: MetricData[] = Array.from({ length: 90 }, (_
 
   return {
     date,
-    revenue: getRandomNumber(60000000, 180000000), // $15k-$45k USD -> $60M-$180M COP
-    leads: getRandomNumber(3, 12),
-    conversions: getRandomNumber(0, 3),
-    activeStudents: 120 + getRandomNumber(-5, 5)
+    revenue: getRandomNumber(6_000_000, 10_000_000), // ~$1.5k-2.5k USD daily -> 6M-10M COP
+    leads: getRandomNumber(14, 20), // ~500 leads/month = ~16/day
+    conversions: getRandomNumber(1, 3), // ~60 conversions/month = ~2/day
+    activeStudents: 55 + getRandomNumber(-3, 3)
   };
 });
 
@@ -272,7 +273,7 @@ export const mockChannelMetrics: ChannelMetric[] = CHANNELS.map(channel => {
     .filter(l => l.channel === channel && l.status === 'converted')
     .reduce((sum, l) => sum + l.expectedRevenue, 0);
 
-  const cac = getRandomNumber(3200000, 10000000); // $800-$2,500 USD -> $3.2M-$10M COP
+  const cac = getRandomNumber(800_000, 2_000_000); // $200-$500 USD -> 800k-2M COP
   const ltv = revenue / Math.max(conversions, 1);
 
   return {
@@ -311,7 +312,7 @@ export const mockActivities: Activity[] = [
     studentName: 'María González',
     advisorName: 'Patricia Gómez',
     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    amount: 60000000 // $15k USD -> $60M COP
+    amount: 4_200_000 // ~$1,050 USD
   },
   {
     id: 'act-2',
@@ -339,7 +340,7 @@ export const mockActivities: Activity[] = [
     studentName: 'Luis Mendoza',
     advisorName: 'Valentina Torres',
     timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000),
-    amount: 32000000 // $8k USD -> $32M COP
+    amount: 3_800_000 // ~$950 USD
   },
   {
     id: 'act-5',
@@ -349,7 +350,7 @@ export const mockActivities: Activity[] = [
     studentName: 'Valentina Silva',
     advisorName: 'Andrés Silva',
     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    amount: 72000000 // $18k USD -> $72M COP
+    amount: 5_200_000 // ~$1,300 USD
   },
   {
     id: 'act-6',
@@ -419,18 +420,18 @@ export const mockWebMetrics: WebMetric[] = Array.from({ length: 30 }, (_, i) => 
   };
 });
 
-// Marketing Campaigns
+// Marketing Campaigns (Realistic scale)
 export const mockMarketingCampaigns: MarketingCampaign[] = [
   {
     id: 'camp-1',
     name: 'Becas de Verano 2024',
     channel: 'facebook',
-    investment: 48000000, // $12k USD -> $48M COP
+    investment: 2_500_000, // ~$625 USD
     leads: 145,
-    conversions: 23,
-    revenue: 1380000000, // $345k USD
-    cac: 2087000, // ~$521 USD
-    roi: 2775,
+    conversions: 18,
+    revenue: 72_000_000, // ~$18k USD
+    cac: 139_000, // ~$35 USD
+    roi: 2780,
     startDate: new Date('2024-06-01'),
     endDate: new Date('2024-08-31'),
     status: 'completed'
@@ -439,12 +440,12 @@ export const mockMarketingCampaigns: MarketingCampaign[] = [
     id: 'camp-2',
     name: 'Masters Excellence Program',
     channel: 'google_ads',
-    investment: 60000000, // $15k USD
+    investment: 3_200_000, // ~$800 USD
     leads: 98,
-    conversions: 31,
-    revenue: 1860000000, // $465k USD
-    cac: 1935000, // ~$484 USD
-    roi: 3000,
+    conversions: 14,
+    revenue: 84_000_000, // ~$21k USD
+    cac: 229_000, // ~$57 USD
+    roi: 2525,
     startDate: new Date('2024-07-01'),
     status: 'active'
   },
@@ -452,12 +453,12 @@ export const mockMarketingCampaigns: MarketingCampaign[] = [
     id: 'camp-3',
     name: 'LinkedIn Professional Network',
     channel: 'linkedin',
-    investment: 32000000, // $8k USD
+    investment: 1_800_000, // ~$450 USD
     leads: 67,
-    conversions: 18,
-    revenue: 1080000000, // $270k USD
-    cac: 1778000, // ~$444 USD
-    roi: 3275,
+    conversions: 11,
+    revenue: 66_000_000, // ~$16.5k USD
+    cac: 164_000, // ~$41 USD
+    roi: 3567,
     startDate: new Date('2024-05-15'),
     status: 'active'
   },
@@ -465,12 +466,12 @@ export const mockMarketingCampaigns: MarketingCampaign[] = [
     id: 'camp-4',
     name: 'Instagram Stories Campaign',
     channel: 'instagram',
-    investment: 24000000, // $6k USD
+    investment: 1_200_000, // ~$300 USD
     leads: 203,
-    conversions: 15,
-    revenue: 900000000, // $225k USD
-    cac: 1182000, // ~$295 USD
-    roi: 3650,
+    conversions: 12,
+    revenue: 48_000_000, // ~$12k USD
+    cac: 100_000, // ~$25 USD
+    roi: 3900,
     startDate: new Date('2024-08-01'),
     status: 'active'
   },
@@ -478,12 +479,12 @@ export const mockMarketingCampaigns: MarketingCampaign[] = [
     id: 'camp-5',
     name: 'Podcast Sponsorship Series',
     channel: 'podcast',
-    investment: 16000000, // $4k USD
+    investment: 1_000_000, // ~$250 USD
     leads: 89,
-    conversions: 12,
-    revenue: 720000000, // $180k USD
-    cac: 1348000, // ~$337 USD
-    roi: 4400,
+    conversions: 10,
+    revenue: 50_000_000, // ~$12.5k USD
+    cac: 100_000, // ~$25 USD
+    roi: 4900,
     startDate: new Date('2024-04-01'),
     endDate: new Date('2024-09-30'),
     status: 'completed'
@@ -492,12 +493,12 @@ export const mockMarketingCampaigns: MarketingCampaign[] = [
     id: 'camp-6',
     name: 'WhatsApp Business Automation',
     channel: 'whatsapp',
-    investment: 8000000, // $2k USD
+    investment: 500_000, // ~$125 USD
     leads: 156,
     conversions: 8,
-    revenue: 480000000, // $120k USD
-    cac: 1000000, // $250 USD
-    roi: 5900,
+    revenue: 32_000_000, // ~$8k USD
+    cac: 63_000, // ~$16 USD
+    roi: 6300,
     startDate: new Date('2024-09-01'),
     status: 'active'
   }
@@ -619,15 +620,15 @@ export const mockStudentSuccessMetrics: StudentSuccessMetric[] = [
 
 // ============ ANALYTICS DASHBOARD DATA ============
 
-// Financial Metrics (last 12 months)
+// Financial Metrics (last 12 months) - Realistic scale
 export const mockFinancialMetrics: FinancialMetric[] = Array.from({ length: 12 }, (_, i) => {
   const date = new Date();
   date.setMonth(date.getMonth() - (11 - i));
 
-  const revenue = getRandomNumber(1800000000, 3600000000); // $450k-$900k USD -> $1.8B-$3.6B COP
-  const costs = revenue * getRandomNumber(25, 40) / 100; // 25-40% of revenue
+  const revenue = getRandomNumber(180_000_000, 280_000_000); // $45k-$70k USD -> 180M-280M COP
+  const costs = revenue * getRandomNumber(35, 42) / 100; // 35-42% of revenue
   const grossProfit = revenue - costs;
-  const operatingExpenses = revenue * getRandomNumber(15, 25) / 100; // 15-25% of revenue
+  const operatingExpenses = revenue * getRandomNumber(15, 22) / 100; // 15-22% of revenue
   const netProfit = grossProfit - operatingExpenses;
 
   return {
@@ -638,7 +639,7 @@ export const mockFinancialMetrics: FinancialMetric[] = Array.from({ length: 12 }
     margin: (grossProfit / revenue) * 100,
     operatingExpenses,
     netProfit,
-    cashFlow: netProfit + getRandomNumber(-200000000, 400000000) // some variance
+    cashFlow: netProfit + getRandomNumber(-10_000_000, 20_000_000) // some variance
   };
 });
 
@@ -669,7 +670,7 @@ export const mockAnnualMetrics: AnnualMetric[] = [
   };
 });
 
-// Conversion Funnel
+// Conversion Funnel (Realistic scale - proportional to ~500 leads/month)
 export const mockConversionFunnel: ConversionFunnel[] = [
   {
     stage: 'Visitantes Web',
@@ -679,43 +680,43 @@ export const mockConversionFunnel: ConversionFunnel[] = [
   },
   {
     stage: 'Leads Generados',
-    count: 2250,
-    percentage: 5.0,
-    dropoffRate: 95.0
+    count: 500,
+    percentage: 1.1,
+    dropoffRate: 98.9
   },
   {
     stage: 'Leads Contactados',
-    count: 1800,
-    percentage: 4.0,
+    count: 400,
+    percentage: 0.89,
     dropoffRate: 20.0
   },
   {
     stage: 'Leads Calificados',
-    count: 900,
-    percentage: 2.0,
-    dropoffRate: 50.0
+    count: 180,
+    percentage: 0.4,
+    dropoffRate: 55.0
   },
   {
     stage: 'Conversiones',
-    count: 270,
-    percentage: 0.6,
-    dropoffRate: 70.0
+    count: 60,
+    percentage: 0.13,
+    dropoffRate: 66.7
   },
   {
     stage: 'Estudiantes Activos',
-    count: 132,
-    percentage: 0.29,
-    dropoffRate: 51.1
+    count: 55,
+    percentage: 0.12,
+    dropoffRate: 8.3
   }
 ];
 
-// Executive KPIs
+// Executive KPIs (Realistic scale - ~$720k USD/year = ~2.9B COP/year)
 export const mockExecutiveKPIs: ExecutiveKPI[] = [
   {
     category: 'Revenue',
     name: 'Ingresos Anuales',
-    value: 28800000000, // $7.2M USD -> $28.8B COP
-    target: 32000000000, // $8M USD -> $32B COP
+    value: 2_880_000_000, // $720k USD -> 2.88B COP (12 months * 240M)
+    target: 3_200_000_000, // $800k USD -> 3.2B COP
     achievement: 90,
     trend: 'up'
   },
@@ -730,41 +731,41 @@ export const mockExecutiveKPIs: ExecutiveKPI[] = [
   {
     category: 'Growth',
     name: 'Nuevos Leads (anual)',
-    value: 2250,
-    target: 2400,
+    value: 6000, // ~500/month * 12
+    target: 6400,
     achievement: 93.8,
     trend: 'up'
   },
   {
     category: 'Growth',
     name: 'Tasa de Conversión',
-    value: 27.5,
-    target: 25,
-    achievement: 110,
+    value: 12.0, // Realistic conversion rate
+    target: 14.0,
+    achievement: 85.7,
     trend: 'up'
   },
   {
     category: 'Efficiency',
     name: 'CAC Promedio',
-    value: 1900000, // ~$475 USD
-    target: 2400000, // ~$600 USD
-    achievement: 126,
+    value: 1_200_000, // ~$300 USD
+    target: 1_600_000, // ~$400 USD
+    achievement: 133,
     trend: 'down'
   },
   {
     category: 'Efficiency',
     name: 'LTV/CAC Ratio',
-    value: 6.8,
-    target: 5.0,
-    achievement: 136,
+    value: 3.3, // 4M avg commission / 1.2M CAC
+    target: 3.0,
+    achievement: 110,
     trend: 'up'
   },
   {
     category: 'Customer',
     name: 'Estudiantes Activos',
-    value: 132,
-    target: 150,
-    achievement: 88,
+    value: 55,
+    target: 65,
+    achievement: 84.6,
     trend: 'up'
   },
   {
@@ -778,9 +779,9 @@ export const mockExecutiveKPIs: ExecutiveKPI[] = [
   {
     category: 'Customer',
     name: 'Tasa de Retención',
-    value: 94.8,
+    value: 92.0,
     target: 90,
-    achievement: 105.3,
+    achievement: 102.2,
     trend: 'up'
   }
 ];

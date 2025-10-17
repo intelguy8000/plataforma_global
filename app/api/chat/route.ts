@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { getCurrentMonthMetrics, mockLeads, mockStudents, getTopAdvisors, mockChannelMetrics } from '@/lib/data/mock-data';
+import { mockLeads, getTopAdvisors, mockChannelMetrics } from '@/lib/data/mock-data';
+import { getCurrentMonthData, getLastNMonths, calculateTotals } from '@/lib/data/historical-data';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -20,11 +21,16 @@ export async function POST(req: NextRequest) {
     const { message, conversationHistory } = await req.json();
 
     // Get current data for context
-    const metrics = getCurrentMonthMetrics();
     const topAdvisors = getTopAdvisors(3);
     const totalLeads = mockLeads.length;
-    const activeStudents = mockStudents.filter(s => s.status === 'active').length;
     const qualifiedLeads = mockLeads.filter(l => l.status === 'qualified').length;
+
+    // Get historical data
+    const currentMonthHistorical = getCurrentMonthData();
+    const last3Months = getLastNMonths(3);
+    const last3MonthsTotals = calculateTotals(last3Months);
+    const last12Months = getLastNMonths(12);
+    const last12MonthsTotals = calculateTotals(last12Months);
 
     // Channel performance
     const channelPerformance = mockChannelMetrics.map(c => ({
@@ -40,12 +46,29 @@ export async function POST(req: NextRequest) {
 
 CONTEXTO ACTUAL DEL NEGOCIO (Octubre 2024):
 
-📊 MÉTRICAS PRINCIPALES:
-- Revenue del mes: $${metrics.revenue.toLocaleString('es-CO')} COP (+12% vs mes anterior)
-- Nuevos leads este mes: ${metrics.newLeads.toLocaleString('es-CO')}
-- Tasa de conversión: ${metrics.conversionRate.toFixed(1)}%
-- Conversiones este mes: ${metrics.conversions.toLocaleString('es-CO')}
-- Estudiantes activos: ${activeStudents.toLocaleString('es-CO')}
+📊 MÉTRICAS PRINCIPALES (Octubre 2024):
+- Revenue del mes: $${currentMonthHistorical.revenue.toLocaleString('es-CO')} COP
+- Crecimiento vs mes anterior: ${currentMonthHistorical.momGrowth >= 0 ? '+' : ''}${currentMonthHistorical.momGrowth.toFixed(1)}%
+- Crecimiento año a año (YoY): ${currentMonthHistorical.yoyGrowth >= 0 ? '+' : ''}${currentMonthHistorical.yoyGrowth.toFixed(1)}%
+- Nuevos leads este mes: ${currentMonthHistorical.leads.toLocaleString('es-CO')}
+- Tasa de conversión: ${currentMonthHistorical.conversionRate.toFixed(1)}%
+- Conversiones este mes: ${currentMonthHistorical.conversions.toLocaleString('es-CO')}
+- Estudiantes activos: ${currentMonthHistorical.activeStudents.toLocaleString('es-CO')}
+- Margen bruto: ${currentMonthHistorical.marginPercentage.toFixed(1)}%
+- CAC promedio: $${currentMonthHistorical.cac.toLocaleString('es-CO')} COP
+
+📈 ÚLTIMOS 3 MESES (Ago-Oct 2024):
+- Revenue total: $${last3MonthsTotals.totalRevenue.toLocaleString('es-CO')} COP
+- Total leads: ${last3MonthsTotals.totalLeads.toLocaleString('es-CO')}
+- Total conversiones: ${last3MonthsTotals.totalConversions.toLocaleString('es-CO')}
+- Tasa de conversión promedio: ${last3MonthsTotals.avgConversionRate.toFixed(1)}%
+
+📊 ÚLTIMOS 12 MESES (Nov 2023 - Oct 2024):
+- Revenue total: $${last12MonthsTotals.totalRevenue.toLocaleString('es-CO')} COP
+- Total leads: ${last12MonthsTotals.totalLeads.toLocaleString('es-CO')}
+- Total conversiones: ${last12MonthsTotals.totalConversions.toLocaleString('es-CO')}
+- Tasa de conversión promedio: ${last12MonthsTotals.avgConversionRate.toFixed(1)}%
+- Ganancia total: $${last12MonthsTotals.totalProfit.toLocaleString('es-CO')} COP
 
 👥 TOP 3 ASESORES:
 1. ${topAdvisors[0].name}: $${topAdvisors[0].revenue.toLocaleString('es-CO')} COP (${topAdvisors[0].conversionRate.toFixed(1)}% tasa)
@@ -73,16 +96,17 @@ INFORMACIÓN DE LA EMPRESA:
 INSTRUCCIONES:
 1. Responde en español colombiano, de forma profesional pero cercana
 2. Usa formato claro con emojis cuando sea apropiado
-3. Para cifras en COP, usa puntos como separadores de miles (ej: $1.380.000.000)
+3. Para cifras en COP, usa puntos como separadores de miles (ej: $240.000.000)
 4. Sé conciso pero completo (máximo 5-6 líneas)
-5. Si te preguntan por comparaciones con meses anteriores, calcula ~12% de crecimiento promedio
-6. Si preguntan "cómo van las ventas", "cuánto hemos vendido", etc. → habla del revenue
-7. Da insights y sugerencias cuando sea relevante
+5. Cuando te pregunten por tendencias o comparaciones históricas, usa los datos de los últimos 12/24 meses
+6. Si preguntan "cómo van las ventas", "cuánto hemos vendido", etc. → habla del revenue y muestra el crecimiento
+7. Da insights y sugerencias cuando sea relevante basándote en tendencias históricas
 8. Si no tienes un dato específico, ofrece los datos relacionados que sí tienes
+9. Tenemos 24 meses de histórico (Nov 2022 - Oct 2024) con temporadas altas en Ene-Mar (matriculas año nuevo) y Jul-Ago (programas de verano)
 
 Ejemplos de buen formato:
-- "Revenue este mes: $1.380.000.000 COP\\n\\n📈 Crecimiento: +12% vs mes anterior"
-- "🏆 Top asesor: Patricia Gómez con $1.560.000.000 COP"`;
+- "Revenue Octubre 2024: $240.000.000 COP\\n\\n📈 Crecimiento MoM: +5.2%\\n📊 YoY: +18.5%"
+- "🏆 Top asesor del mes: Claudia Ramírez con $52.000.000 COP (14.1% conversión)"`;
 
     // Build messages array with conversation history
     const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
