@@ -10,7 +10,8 @@ import {
   getTopAdvisors,
   mockActivities
 } from '@/lib/data/mock-data';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { getYoYComparison } from '@/lib/data/historical-data';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
@@ -20,11 +21,19 @@ import { formatCOP } from '@/lib/utils';
 export default function OverviewPage() {
   const currentMetrics = getCurrentMonthMetrics();
   const topAdvisors = getTopAdvisors(5);
+  const yoyData = getYoYComparison();
 
   // Format data for revenue chart
   const revenueChartData = mockLast30DaysMetrics.map(metric => ({
     date: metric.date.getDate(),
     revenue: metric.revenue
+  }));
+
+  // Format YoY comparison data for chart
+  const yoyChartData = yoyData.map(item => ({
+    month: item.month.substring(0, 3), // First 3 letters (Ene, Feb, etc)
+    '2023': item.year2023 / 1000000, // Convert to millions
+    '2024': item.year2024 / 1000000
   }));
 
   // Format data for pipeline funnel
@@ -78,6 +87,52 @@ export default function OverviewPage() {
           format="number"
         />
       </div>
+
+      {/* YoY Comparison Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Comparación Año a Año (YoY)</CardTitle>
+          <CardDescription>Revenue mensual 2023 vs 2024 - Millones COP</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={yoyChartData}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis
+                dataKey="month"
+                className="text-xs"
+              />
+              <YAxis
+                className="text-xs"
+                tickFormatter={(value) => `$${value}M`}
+              />
+              <Tooltip
+                formatter={(value: number) => [`$${value.toFixed(1)}M COP`, '']}
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))'
+                }}
+              />
+              <Legend
+                wrapperStyle={{ paddingTop: '20px' }}
+                iconType="rect"
+              />
+              <Bar
+                dataKey="2023"
+                fill="#94A3B8"
+                radius={[4, 4, 0, 0]}
+                name="2023"
+              />
+              <Bar
+                dataKey="2024"
+                fill="#10B981"
+                radius={[4, 4, 0, 0]}
+                name="2024"
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
 
       {/* Revenue Trend Chart */}
       <Card>
