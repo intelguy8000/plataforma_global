@@ -238,6 +238,74 @@ export default function AnalyticsPage() {
       </Card>
 
       <div className="grid gap-4 md:grid-cols-2">
+        {/* Conversion Funnel - Visual */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Embudo de Conversión</CardTitle>
+            <CardDescription>Del visitante web al estudiante activo</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center gap-3 py-4">
+              {mockConversionFunnel.map((funnel, index) => {
+                const dropoff = index > 0 ? ((mockConversionFunnel[index - 1].count - funnel.count) / mockConversionFunnel[index - 1].count) * 100 : 0;
+
+                // Visual width calculation:
+                // - Visitantes Web (index 0): 100% width (widest)
+                // - Leads Generados (index 1): 70% width (becomes new 100% reference for stages below)
+                // - Other stages (2-5): proportional to Leads Generados within the 70% scale
+                let visualWidth;
+                if (index === 0) {
+                  visualWidth = 100; // Visitantes Web at 100%
+                } else if (index === 1) {
+                  visualWidth = 70; // Leads Generados at 70% (new reference point)
+                } else {
+                  const leadsGenerados = mockConversionFunnel[1].count; // 500 leads
+                  const proportion = funnel.count / leadsGenerados; // e.g., 400/500 = 0.8
+                  visualWidth = proportion * 70; // e.g., 0.8 * 70 = 56%
+                }
+
+                const colors = ['#3B82F6', '#8B5CF6', '#F59E0B', '#10B981', '#EF4444', '#EC4899'];
+
+                // Format percentage display
+                const percentageDisplay = index === 0 ? '100%' : `(${funnel.percentage.toFixed(2)}%)`;
+
+                return (
+                  <div key={index} className="w-full space-y-2">
+                    {/* Labels outside trapezoid */}
+                    <div className="flex items-center justify-center gap-4 text-sm">
+                      <span className="font-semibold">{funnel.stage}</span>
+                      <span className="font-bold text-lg">{funnel.count.toLocaleString('es-CO')}</span>
+                      <span className="text-muted-foreground">{percentageDisplay}</span>
+                    </div>
+
+                    {/* Funnel Stage Trapezoid */}
+                    <div
+                      className="relative mx-auto transition-all duration-300 hover:opacity-90"
+                      style={{
+                        width: `${visualWidth}%`,
+                        background: colors[index % colors.length],
+                        clipPath: index === mockConversionFunnel.length - 1
+                          ? 'polygon(5% 0%, 95% 0%, 90% 100%, 10% 100%)'
+                          : 'polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%)',
+                        height: '50px'
+                      }}
+                    />
+
+                    {/* Drop-off indicator */}
+                    {index > 0 && dropoff > 0 && (
+                      <div className="text-center py-1">
+                        <p className="text-xs text-red-500 font-medium">
+                          ↓ {dropoff.toFixed(1)}% drop-off ({(mockConversionFunnel[index - 1].count - funnel.count).toLocaleString('es-CO')} perdidos)
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Financial Trend */}
         <Card>
           <CardHeader>
@@ -275,35 +343,6 @@ export default function AnalyticsPage() {
                 />
               </LineChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Conversion Funnel */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Embudo de Conversión</CardTitle>
-            <CardDescription>Del visitante web al estudiante activo</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {mockConversionFunnel.map((stage, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{stage.stage}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">{stage.count.toLocaleString('es-ES')}</span>
-                      <Badge variant="outline">{stage.percentage.toFixed(2)}%</Badge>
-                    </div>
-                  </div>
-                  <Progress value={(stage.count / mockConversionFunnel[0].count) * 100} className="h-2" />
-                  {index < mockConversionFunnel.length - 1 && (
-                    <p className="text-xs text-red-500">
-                      Drop-off: {stage.dropoffRate.toFixed(1)}%
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
           </CardContent>
         </Card>
       </div>
