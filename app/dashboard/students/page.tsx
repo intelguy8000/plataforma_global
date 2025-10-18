@@ -10,7 +10,7 @@ import {
   mockProgramPerformance,
   mockStudentSuccessMetrics
 } from '@/lib/data/mock-data';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, RadialBarChart, RadialBar } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { formatCOP } from '@/lib/utils';
@@ -179,30 +179,70 @@ export default function StudentsPage() {
           <CardDescription>Comparación con benchmarks de la industria</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mockStudentSuccessMetrics.map((metric, index) => {
               const percentage = (metric.value / metric.benchmark) * 100;
               const isAboveBenchmark = metric.value > metric.benchmark;
 
+              // Prepare data for gauge
+              const gaugeData = [
+                {
+                  name: metric.metric,
+                  value: Math.min(percentage, 100),
+                  fill: metric.trend === 'down' ? '#EF4444' : isAboveBenchmark ? '#10B981' : '#F59E0B'
+                }
+              ];
+
               return (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{metric.metric}</span>
-                      <Badge variant={metric.trend === 'up' ? 'default' : 'destructive'} className={metric.trend === 'down' ? 'bg-red-500 hover:bg-red-600' : ''}>
-                        {metric.trend === 'up' ? '↑' : '↓'}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm text-muted-foreground">
-                        Benchmark: {metric.benchmark}
-                      </span>
-                      <span className={`text-sm font-semibold ${isAboveBenchmark ? 'text-green-600' : 'text-yellow-600'}`}>
-                        {metric.value}
-                      </span>
-                    </div>
+                <div key={index} className="flex flex-col items-center">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm font-medium text-center">{metric.metric}</span>
+                    <Badge variant={metric.trend === 'up' ? 'default' : 'destructive'} className={metric.trend === 'down' ? 'bg-red-500 hover:bg-red-600' : ''}>
+                      {metric.trend === 'up' ? '↑' : '↓'}
+                    </Badge>
                   </div>
-                  <Progress value={Math.min(percentage, 100)} className="h-2" />
+
+                  <ResponsiveContainer width="100%" height={180}>
+                    <RadialBarChart
+                      cx="50%"
+                      cy="70%"
+                      innerRadius="60%"
+                      outerRadius="90%"
+                      startAngle={180}
+                      endAngle={0}
+                      data={gaugeData}
+                    >
+                      <RadialBar
+                        background
+                        dataKey="value"
+                        cornerRadius={10}
+                      />
+                      <text
+                        x="50%"
+                        y="60%"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        className="fill-foreground text-2xl font-bold"
+                      >
+                        {metric.value}
+                      </text>
+                      <text
+                        x="50%"
+                        y="75%"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        className="fill-muted-foreground text-xs"
+                      >
+                        Benchmark: {metric.benchmark}
+                      </text>
+                    </RadialBarChart>
+                  </ResponsiveContainer>
+
+                  <div className="text-center mt-2">
+                    <span className={`text-sm font-semibold ${isAboveBenchmark ? 'text-green-600' : 'text-yellow-600'}`}>
+                      {percentage.toFixed(0)}% del benchmark
+                    </span>
+                  </div>
                 </div>
               );
             })}
