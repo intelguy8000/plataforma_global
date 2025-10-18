@@ -179,66 +179,39 @@ export default function StudentsPage() {
           <CardDescription>Comparación con benchmarks de la industria</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {mockStudentSuccessMetrics.map((metric, index) => {
               const percentage = (metric.value / metric.benchmark) * 100;
               const isAboveBenchmark = metric.value > metric.benchmark;
+              const cappedPercentage = Math.min(percentage, 100);
 
-              // Prepare data for gauge
-              const gaugeData = [
-                {
-                  name: metric.metric,
-                  value: Math.min(percentage, 100),
-                  fill: metric.trend === 'down' ? '#EF4444' : isAboveBenchmark ? '#10B981' : '#F59E0B'
-                }
-              ];
+              // Determine color
+              const color = metric.trend === 'down' ? '#EF4444' : isAboveBenchmark ? '#10B981' : '#F59E0B';
 
               return (
                 <div key={index} className="flex flex-col items-center">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-4">
                     <span className="text-sm font-medium text-center">{metric.metric}</span>
                     <Badge variant={metric.trend === 'up' ? 'default' : 'destructive'} className={metric.trend === 'down' ? 'bg-red-500 hover:bg-red-600' : ''}>
                       {metric.trend === 'up' ? '↑' : '↓'}
                     </Badge>
                   </div>
 
-                  <ResponsiveContainer width="100%" height={180}>
-                    <RadialBarChart
-                      cx="50%"
-                      cy="70%"
-                      innerRadius="60%"
-                      outerRadius="90%"
-                      startAngle={180}
-                      endAngle={0}
-                      data={gaugeData}
-                    >
-                      <RadialBar
-                        background
-                        dataKey="value"
-                        cornerRadius={10}
-                      />
-                      <text
-                        x="50%"
-                        y="60%"
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        className="fill-foreground text-2xl font-bold"
-                      >
-                        {metric.value}
-                      </text>
-                      <text
-                        x="50%"
-                        y="75%"
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        className="fill-muted-foreground text-xs"
-                      >
-                        Benchmark: {metric.benchmark}
-                      </text>
-                    </RadialBarChart>
-                  </ResponsiveContainer>
+                  {/* CSS Gauge */}
+                  <div className="relative w-40 h-40 mb-4">
+                    <div
+                      className="absolute inset-0 rounded-full"
+                      style={{
+                        background: `conic-gradient(${color} ${cappedPercentage * 3.6}deg, #1f2937 ${cappedPercentage * 3.6}deg)`
+                      }}
+                    />
+                    <div className="absolute inset-3 bg-background rounded-full flex flex-col items-center justify-center">
+                      <span className="text-3xl font-bold">{metric.value}</span>
+                      <span className="text-xs text-muted-foreground mt-1">Benchmark: {metric.benchmark}</span>
+                    </div>
+                  </div>
 
-                  <div className="text-center mt-2">
+                  <div className="text-center">
                     <span className={`text-sm font-semibold ${isAboveBenchmark ? 'text-green-600' : 'text-yellow-600'}`}>
                       {percentage.toFixed(0)}% del benchmark
                     </span>
