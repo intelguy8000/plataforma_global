@@ -191,6 +191,7 @@ export interface StudentSuccessMetric {
   value: number;
   benchmark: number;
   trend: 'up' | 'down' | 'neutral';
+  isInverse?: boolean; // true for metrics where lower is better (abandono, tiempo)
 }
 
 // Analytics Dashboard Types

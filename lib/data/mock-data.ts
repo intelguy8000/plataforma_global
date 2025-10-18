@@ -739,37 +739,43 @@ export const mockStudentSuccessMetrics: StudentSuccessMetric[] = [
     metric: 'Tasa de Graduación',
     value: 72,
     benchmark: 75,
-    trend: 'up'
+    trend: 'up',
+    isInverse: false
   },
   {
     metric: 'GPA Promedio',
     value: 3.6,
     benchmark: 3.5,
-    trend: 'up'
+    trend: 'up',
+    isInverse: false
   },
   {
     metric: 'Satisfacción Promedio',
     value: 3.9,
     benchmark: 4.0,
-    trend: 'down'
+    trend: 'down',
+    isInverse: false
   },
   {
     metric: 'Tasa de Abandono',
     value: 6.8,
     benchmark: 8.0,
-    trend: 'down'
+    trend: 'down',
+    isInverse: true // Lower is better - meta is "máximo 8%"
   },
   {
     metric: 'Success Score',
     value: 82,
     benchmark: 78,
-    trend: 'up'
+    trend: 'up',
+    isInverse: false
   },
   {
     metric: 'Tiempo Promedio a Graduación (meses)',
     value: 21,
     benchmark: 24,
-    trend: 'down'
+    trend: 'down',
+    isInverse: true // Lower is better - meta is "máximo 24 meses"
   }
 ];
 

@@ -181,12 +181,65 @@ export default function StudentsPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {mockStudentSuccessMetrics.map((metric, index) => {
-              const percentage = (metric.value / metric.benchmark) * 100;
-              const isAboveBenchmark = metric.value > metric.benchmark;
-              const cappedPercentage = Math.min(percentage, 100);
+              // Calculate percentage vs meta
+              let percentage: number;
+              let performanceText: string;
 
-              // Determine color
-              const color = metric.trend === 'down' ? '#EF4444' : isAboveBenchmark ? '#10B981' : '#F59E0B';
+              if (metric.isInverse) {
+                // For inverse metrics (lower is better), calculate how much under the max benchmark
+                // If value < benchmark, that's good (e.g., 6.8 < 8 = good)
+                percentage = (1 - (metric.value / metric.benchmark)) * 100 + 100;
+                // Cap at 100% if already at or better than benchmark
+                if (metric.value <= metric.benchmark) {
+                  const improvementRatio = (metric.benchmark - metric.value) / metric.benchmark;
+                  percentage = 100 + (improvementRatio * 100); // Scale to show how much better
+                } else {
+                  percentage = (metric.benchmark / metric.value) * 100;
+                }
+                performanceText = metric.value <= metric.benchmark
+                  ? `Bajo meta (${metric.value} de máx ${metric.benchmark})`
+                  : `Sobre meta (${metric.value} de máx ${metric.benchmark})`;
+              } else {
+                // For normal metrics (higher is better)
+                percentage = (metric.value / metric.benchmark) * 100;
+                performanceText = `${percentage.toFixed(0)}% de la meta`;
+              }
+
+              // Determine color based on percentage ranges
+              let color: string;
+              let textColorClass: string;
+
+              if (metric.isInverse) {
+                // For inverse metrics, being under benchmark is good
+                if (metric.value <= metric.benchmark) {
+                  color = '#10B981'; // Green - good!
+                  textColorClass = 'text-green-600';
+                } else {
+                  const overagePercentage = ((metric.value - metric.benchmark) / metric.benchmark) * 100;
+                  if (overagePercentage > 50) {
+                    color = '#EF4444'; // Red - way over
+                    textColorClass = 'text-red-600';
+                  } else {
+                    color = '#F59E0B'; // Yellow - slightly over
+                    textColorClass = 'text-yellow-600';
+                  }
+                }
+              } else {
+                // For normal metrics, use standard ranges
+                if (percentage >= 80) {
+                  color = '#10B981'; // Green
+                  textColorClass = 'text-green-600';
+                } else if (percentage >= 50) {
+                  color = '#F59E0B'; // Yellow
+                  textColorClass = 'text-yellow-600';
+                } else {
+                  color = '#EF4444'; // Red
+                  textColorClass = 'text-red-600';
+                }
+              }
+
+              // For gauge display, cap at 100%
+              const gaugePercentage = Math.min(percentage, 100);
 
               return (
                 <div key={index} className="flex flex-col items-center">
@@ -202,18 +255,18 @@ export default function StudentsPage() {
                     <div
                       className="absolute inset-0 rounded-full"
                       style={{
-                        background: `conic-gradient(${color} ${cappedPercentage * 3.6}deg, #1f2937 ${cappedPercentage * 3.6}deg)`
+                        background: `conic-gradient(${color} ${gaugePercentage * 3.6}deg, #1f2937 ${gaugePercentage * 3.6}deg)`
                       }}
                     />
                     <div className="absolute inset-3 bg-background rounded-full flex flex-col items-center justify-center">
                       <span className="text-3xl font-bold">{metric.value}</span>
-                      <span className="text-xs text-muted-foreground mt-1">Meta: {metric.benchmark}</span>
+                      <span className="text-xs text-muted-foreground mt-1">Meta: {metric.isInverse ? 'máx ' : ''}{metric.benchmark}</span>
                     </div>
                   </div>
 
                   <div className="text-center">
-                    <span className={`text-sm font-semibold ${isAboveBenchmark ? 'text-green-600' : 'text-yellow-600'}`}>
-                      {percentage.toFixed(0)}% de la meta
+                    <span className={`text-sm font-semibold ${textColorClass}`}>
+                      {performanceText}
                     </span>
                   </div>
                 </div>
