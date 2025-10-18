@@ -161,23 +161,42 @@ export default function MarketingPage() {
           <CardDescription>Del visitante web al cliente convertido</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <div className="flex flex-col items-center gap-1 py-4">
             {funnelStages.map((funnel, index) => {
               const dropoff = index > 0 ? ((funnelStages[index - 1].count - funnel.count) / funnelStages[index - 1].count) * 100 : 0;
+              const widthPercentage = funnel.percentage;
+              const colors = ['#3B82F6', '#8B5CF6', '#F59E0B', '#10B981', '#EF4444'];
+
               return (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{funnel.stage}</span>
-                    <div className="flex items-center gap-4">
-                      <span className="text-muted-foreground">{funnel.count.toLocaleString('es-CO')}</span>
-                      <Badge variant="outline">{funnel.percentage.toFixed(2)}%</Badge>
+                <div key={index} className="w-full">
+                  {/* Funnel Stage */}
+                  <div
+                    className="relative mx-auto transition-all duration-300 hover:opacity-90"
+                    style={{
+                      width: `${widthPercentage}%`,
+                      background: colors[index % colors.length],
+                      clipPath: index === funnelStages.length - 1
+                        ? 'polygon(5% 0%, 95% 0%, 90% 100%, 10% 100%)'
+                        : 'polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%)',
+                      minHeight: '70px'
+                    }}
+                  >
+                    <div className="flex items-center justify-between px-6 py-4 text-white">
+                      <span className="font-semibold text-sm">{funnel.stage}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold">{funnel.count.toLocaleString('es-CO')}</span>
+                        <span className="text-xs opacity-90">({funnel.percentage.toFixed(2)}%)</span>
+                      </div>
                     </div>
                   </div>
-                  <Progress value={funnel.percentage} className="h-3" />
+
+                  {/* Drop-off indicator */}
                   {index > 0 && dropoff > 0 && (
-                    <p className="text-xs text-red-500">
-                      Drop-off: {dropoff.toFixed(1)}% ({(funnelStages[index - 1].count - funnel.count).toLocaleString('es-CO')} perdidos)
-                    </p>
+                    <div className="text-center py-1">
+                      <p className="text-xs text-red-500 font-medium">
+                        ↓ {dropoff.toFixed(1)}% drop-off ({(funnelStages[index - 1].count - funnel.count).toLocaleString('es-CO')} perdidos)
+                      </p>
+                    </div>
                   )}
                 </div>
               );
