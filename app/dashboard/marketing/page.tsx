@@ -161,7 +161,7 @@ export default function MarketingPage() {
           <CardDescription>Del visitante web al cliente convertido</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center gap-1 py-4">
+          <div className="flex flex-col items-center gap-3 py-4">
             {funnelStages.map((funnel, index) => {
               const dropoff = index > 0 ? ((funnelStages[index - 1].count - funnel.count) / funnelStages[index - 1].count) * 100 : 0;
 
@@ -186,8 +186,15 @@ export default function MarketingPage() {
               const percentageDisplay = index === 0 ? '100%' : `(${funnel.percentage.toFixed(2)}%)`;
 
               return (
-                <div key={index} className="w-full">
-                  {/* Funnel Stage */}
+                <div key={index} className="w-full space-y-2">
+                  {/* Labels outside trapezoid */}
+                  <div className="flex items-center justify-center gap-4 text-sm">
+                    <span className="font-semibold">{funnel.stage}</span>
+                    <span className="font-bold text-lg">{funnel.count.toLocaleString('es-CO')}</span>
+                    <span className="text-muted-foreground">{percentageDisplay}</span>
+                  </div>
+
+                  {/* Funnel Stage Trapezoid */}
                   <div
                     className="relative mx-auto transition-all duration-300 hover:opacity-90"
                     style={{
@@ -196,17 +203,9 @@ export default function MarketingPage() {
                       clipPath: index === funnelStages.length - 1
                         ? 'polygon(5% 0%, 95% 0%, 90% 100%, 10% 100%)'
                         : 'polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%)',
-                      minHeight: '70px'
+                      height: '50px'
                     }}
-                  >
-                    <div className="flex flex-col items-center justify-center gap-2 px-6 py-4 text-white">
-                      <span className="font-semibold text-sm">{funnel.stage}</span>
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-lg">{funnel.count.toLocaleString('es-CO')}</span>
-                        <span className="text-sm opacity-90">{percentageDisplay}</span>
-                      </div>
-                    </div>
-                  </div>
+                  />
 
                   {/* Drop-off indicator */}
                   {index > 0 && dropoff > 0 && (
