@@ -164,7 +164,13 @@ export default function MarketingPage() {
           <div className="flex flex-col items-center gap-1 py-4">
             {funnelStages.map((funnel, index) => {
               const dropoff = index > 0 ? ((funnelStages[index - 1].count - funnel.count) / funnelStages[index - 1].count) * 100 : 0;
-              const widthPercentage = funnel.percentage;
+
+              // Visual scale: use logarithmic approach for better visibility
+              // Map percentages to a visual range of 30% to 100%
+              const minVisualWidth = 30;
+              const maxVisualWidth = 100;
+              const visualWidth = minVisualWidth + ((funnel.percentage / 100) * (maxVisualWidth - minVisualWidth));
+
               const colors = ['#3B82F6', '#8B5CF6', '#F59E0B', '#10B981', '#EF4444'];
 
               return (
@@ -173,7 +179,7 @@ export default function MarketingPage() {
                   <div
                     className="relative mx-auto transition-all duration-300 hover:opacity-90"
                     style={{
-                      width: `${widthPercentage}%`,
+                      width: `${visualWidth}%`,
                       background: colors[index % colors.length],
                       clipPath: index === funnelStages.length - 1
                         ? 'polygon(5% 0%, 95% 0%, 90% 100%, 10% 100%)'
