@@ -10,6 +10,7 @@ import {
   mockProgramPerformance,
   mockStudentSuccessMetrics
 } from '@/lib/data/mock-data';
+import { getCurrentMonthData } from '@/lib/data/historical-data';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -17,8 +18,10 @@ import { formatCOP } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 
 export default function StudentsPage() {
+  const currentMonth = getCurrentMonthData();
+
   const totalStudents = mockStudents.length;
-  const activeStudents = mockStudents.filter(s => s.status === 'active').length;
+  const activeStudents = currentMonth.activeStudents; // Use data from historical-data
   const graduatedStudents = mockStudents.filter(s => s.status === 'graduated').length;
   const avgSatisfaction = mockStudents.reduce((sum, s) => sum + (s.satisfactionScore || 0), 0) / totalStudents;
 

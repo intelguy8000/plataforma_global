@@ -4,13 +4,12 @@ import { KPICard } from '@/components/dashboard/kpi-card';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, Users, TrendingUp, Target } from 'lucide-react';
 import {
-  getCurrentMonthMetrics,
   mockLast30DaysMetrics,
   mockPipelineMetrics,
   getTopAdvisors,
   mockActivities
 } from '@/lib/data/mock-data';
-import { getYoYComparison } from '@/lib/data/historical-data';
+import { getYoYComparison, getCurrentMonthData } from '@/lib/data/historical-data';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +18,7 @@ import { es } from 'date-fns/locale';
 import { formatCOP } from '@/lib/utils';
 
 export default function OverviewPage() {
-  const currentMetrics = getCurrentMonthMetrics();
+  const currentMonth = getCurrentMonthData();
   const topAdvisors = getTopAdvisors(5);
   const yoyData = getYoYComparison();
 
@@ -59,30 +58,30 @@ export default function OverviewPage() {
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <KPICard
-          title="Revenue MTD"
-          value={currentMetrics.revenue}
-          change={12.5}
+          title="Revenue Mes Actual"
+          value={currentMonth.revenue}
+          change={currentMonth.momGrowth}
           icon={DollarSign}
           format="currency"
         />
         <KPICard
-          title="Nuevos Leads"
-          value={currentMetrics.newLeads}
-          change={8.2}
+          title="Leads Mes Actual"
+          value={currentMonth.leads}
+          change={19.9}
           icon={Users}
           format="number"
         />
         <KPICard
           title="Tasa Conversión"
-          value={currentMetrics.conversionRate}
-          change={3.1}
+          value={currentMonth.conversionRate}
+          change={0}
           icon={Target}
           format="percentage"
         />
         <KPICard
           title="Estudiantes Activos"
-          value={currentMetrics.activeStudents}
-          change={-2.4}
+          value={currentMonth.activeStudents}
+          change={19.7}
           icon={TrendingUp}
           format="number"
         />
