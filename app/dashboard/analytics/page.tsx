@@ -191,13 +191,27 @@ export default function AnalyticsPage() {
                 tickFormatter={(value) => `${value}%`}
               />
               <Tooltip
-                formatter={(value: number, name: string) => {
-                  if (name === 'marginPercentage') return [`${value.toFixed(1)}%`, '% Margen'];
-                  return [`$${value.toFixed(0)}M`, name === 'revenue' ? 'Revenue' : 'Proyectado'];
+                content={({ active, payload }) => {
+                  if (!active || !payload || !payload.length) return null;
+
+                  const data = payload[0].payload;
+                  const isProjection = data.isProjection;
+                  const revenue = data.revenue;
+                  const margin = data.marginPercentage;
+
+                  return (
+                    <div className="bg-background border border-border p-3 rounded shadow-lg">
+                      <p className="font-medium mb-1">{data.month}</p>
+                      <p className="text-sm text-blue-600">
+                        {isProjection ? 'Proyectado' : 'Revenue'}: ${revenue.toFixed(0)}M
+                      </p>
+                      <p className="text-sm text-green-600">
+                        {isProjection ? '% Margen Proyectado' : '% Margen'}: {margin.toFixed(1)}%
+                      </p>
+                    </div>
+                  );
                 }}
-                contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
               />
-              <Legend />
               <Bar
                 yAxisId="left"
                 dataKey="revenue"
@@ -220,24 +234,6 @@ export default function AnalyticsPage() {
               />
             </ComposedChart>
           </ResponsiveContainer>
-          <div className="mt-4 flex items-center justify-center gap-6 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-blue-500 rounded"></div>
-              <span>Histórico</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-blue-500 opacity-50 rounded"></div>
-              <span>Proyección</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-0.5 bg-green-500"></div>
-              <span>% Margen Real</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-0.5 bg-green-500 border-dashed border-t-2"></div>
-              <span>% Margen Proyectado</span>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
