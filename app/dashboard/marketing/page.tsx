@@ -166,14 +166,18 @@ export default function MarketingPage() {
               const dropoff = index > 0 ? ((funnelStages[index - 1].count - funnel.count) / funnelStages[index - 1].count) * 100 : 0;
 
               // Visual width calculation:
-              // - First stage (Visitantes Web) is always 100%
-              // - Other stages are proportional to Leads Generados (index 1)
+              // - Visitantes Web (index 0): 100% width (widest)
+              // - Leads Generados (index 1): 70% width (becomes new 100% reference for stages below)
+              // - Other stages (2-4): proportional to Leads Generados within the 70% scale
               let visualWidth;
               if (index === 0) {
-                visualWidth = 100; // Always 100% for Visitantes Web
+                visualWidth = 100; // Visitantes Web at 100%
+              } else if (index === 1) {
+                visualWidth = 70; // Leads Generados at 70% (new reference point)
               } else {
-                const leadsGenerados = funnelStages[1].count; // Reference value (500)
-                visualWidth = (funnel.count / leadsGenerados) * 70 + 30; // Scale to 30-100% range
+                const leadsGenerados = funnelStages[1].count; // 500 leads
+                const proportion = funnel.count / leadsGenerados; // e.g., 400/500 = 0.8
+                visualWidth = proportion * 70; // e.g., 0.8 * 70 = 56%
               }
 
               const colors = ['#3B82F6', '#8B5CF6', '#F59E0B', '#10B981', '#EF4444'];
@@ -195,11 +199,11 @@ export default function MarketingPage() {
                       minHeight: '70px'
                     }}
                   >
-                    <div className={`flex items-center ${index === 0 ? 'justify-center' : 'justify-between'} px-6 py-4 text-white`}>
+                    <div className="flex flex-col items-center justify-center gap-2 px-6 py-4 text-white">
                       <span className="font-semibold text-sm">{funnel.stage}</span>
                       <div className="flex items-center gap-3">
-                        <span className="font-bold">{funnel.count.toLocaleString('es-CO')}</span>
-                        <span className="text-xs opacity-90">{percentageDisplay}</span>
+                        <span className="font-bold text-lg">{funnel.count.toLocaleString('es-CO')}</span>
+                        <span className="text-sm opacity-90">{percentageDisplay}</span>
                       </div>
                     </div>
                   </div>
