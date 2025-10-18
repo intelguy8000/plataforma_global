@@ -165,13 +165,21 @@ export default function MarketingPage() {
             {funnelStages.map((funnel, index) => {
               const dropoff = index > 0 ? ((funnelStages[index - 1].count - funnel.count) / funnelStages[index - 1].count) * 100 : 0;
 
-              // Visual scale: use logarithmic approach for better visibility
-              // Map percentages to a visual range of 30% to 100%
-              const minVisualWidth = 30;
-              const maxVisualWidth = 100;
-              const visualWidth = minVisualWidth + ((funnel.percentage / 100) * (maxVisualWidth - minVisualWidth));
+              // Visual width calculation:
+              // - First stage (Visitantes Web) is always 100%
+              // - Other stages are proportional to Leads Generados (index 1)
+              let visualWidth;
+              if (index === 0) {
+                visualWidth = 100; // Always 100% for Visitantes Web
+              } else {
+                const leadsGenerados = funnelStages[1].count; // Reference value (500)
+                visualWidth = (funnel.count / leadsGenerados) * 70 + 30; // Scale to 30-100% range
+              }
 
               const colors = ['#3B82F6', '#8B5CF6', '#F59E0B', '#10B981', '#EF4444'];
+
+              // Format percentage display
+              const percentageDisplay = index === 0 ? '100%' : `(${funnel.percentage.toFixed(2)}%)`;
 
               return (
                 <div key={index} className="w-full">
@@ -187,11 +195,11 @@ export default function MarketingPage() {
                       minHeight: '70px'
                     }}
                   >
-                    <div className="flex items-center justify-between px-6 py-4 text-white">
+                    <div className={`flex items-center ${index === 0 ? 'justify-center' : 'justify-between'} px-6 py-4 text-white`}>
                       <span className="font-semibold text-sm">{funnel.stage}</span>
                       <div className="flex items-center gap-3">
                         <span className="font-bold">{funnel.count.toLocaleString('es-CO')}</span>
-                        <span className="text-xs opacity-90">({funnel.percentage.toFixed(2)}%)</span>
+                        <span className="text-xs opacity-90">{percentageDisplay}</span>
                       </div>
                     </div>
                   </div>
