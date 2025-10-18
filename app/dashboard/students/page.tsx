@@ -207,13 +207,13 @@ export default function StudentsPage() {
                     />
                     <div className="absolute inset-3 bg-background rounded-full flex flex-col items-center justify-center">
                       <span className="text-3xl font-bold">{metric.value}</span>
-                      <span className="text-xs text-muted-foreground mt-1">Benchmark: {metric.benchmark}</span>
+                      <span className="text-xs text-muted-foreground mt-1">Meta: {metric.benchmark}</span>
                     </div>
                   </div>
 
                   <div className="text-center">
                     <span className={`text-sm font-semibold ${isAboveBenchmark ? 'text-green-600' : 'text-yellow-600'}`}>
-                      {percentage.toFixed(0)}% del benchmark
+                      {percentage.toFixed(0)}% de la meta
                     </span>
                   </div>
                 </div>

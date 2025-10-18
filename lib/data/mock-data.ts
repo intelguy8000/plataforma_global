@@ -733,41 +733,41 @@ export const mockProgramPerformance: ProgramPerformance[] = PROGRAM_TYPES.map(pr
   };
 });
 
-// Student Success Metrics
+// Student Success Metrics - More realistic with mix of above/below meta
 export const mockStudentSuccessMetrics: StudentSuccessMetric[] = [
   {
     metric: 'Tasa de Graduación',
-    value: 87,
+    value: 72,
     benchmark: 75,
     trend: 'up'
   },
   {
     metric: 'GPA Promedio',
-    value: 3.8,
+    value: 3.6,
     benchmark: 3.5,
     trend: 'up'
   },
   {
     metric: 'Satisfacción Promedio',
-    value: 4.3,
+    value: 3.9,
     benchmark: 4.0,
-    trend: 'up'
+    trend: 'down'
   },
   {
     metric: 'Tasa de Abandono',
-    value: 5.2,
+    value: 6.8,
     benchmark: 8.0,
     trend: 'down'
   },
   {
     metric: 'Success Score',
-    value: 85,
+    value: 82,
     benchmark: 78,
     trend: 'up'
   },
   {
     metric: 'Tiempo Promedio a Graduación (meses)',
-    value: 18,
+    value: 21,
     benchmark: 24,
     trend: 'down'
   }
