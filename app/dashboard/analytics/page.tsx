@@ -135,7 +135,9 @@ export default function AnalyticsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Performance Anual</CardTitle>
-          <CardDescription>Revenue, costos y beneficio por mes</CardDescription>
+          <CardDescription>
+            Últimos 12 meses: {format(last12Months[0].date, 'MMM yyyy', { locale: es })} - {format(last12Months[last12Months.length - 1].date, 'MMM yyyy', { locale: es })}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
