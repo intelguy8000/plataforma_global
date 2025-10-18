@@ -737,14 +737,14 @@ export const mockProgramPerformance: ProgramPerformance[] = PROGRAM_TYPES.map(pr
 export const mockStudentSuccessMetrics: StudentSuccessMetric[] = [
   {
     metric: 'Tasa de Graduación',
-    value: 72,
+    value: 60,
     benchmark: 75,
     trend: 'up',
     isInverse: false
   },
   {
     metric: 'GPA Promedio',
-    value: 3.6,
+    value: 3.1,
     benchmark: 3.5,
     trend: 'up',
     isInverse: false
@@ -765,7 +765,7 @@ export const mockStudentSuccessMetrics: StudentSuccessMetric[] = [
   },
   {
     metric: 'Success Score',
-    value: 82,
+    value: 65,
     benchmark: 78,
     trend: 'up',
     isInverse: false
