@@ -33,13 +33,14 @@ export default function AnalyticsPage() {
   const last12Months = getLastNMonths(12);
   const last6Months = getLastNMonths(6);
 
-  // Calculate averages and totals
+  // Calculate averages and current month
   const avgMargin = last12Months.reduce((sum, m) => sum + m.marginPercentage, 0) / last12Months.length;
 
-  // Year to date summary
-  const yearToDateRevenue = last12Months.reduce((sum, m) => sum + m.revenue, 0);
-  const yearToDateProfit = last12Months.reduce((sum, m) => sum + m.netProfit, 0);
-  const yearToDateLeads = last12Months.reduce((sum, m) => sum + m.leads, 0);
+  // Current month metrics (most recent)
+  const currentMonth = last12Months[last12Months.length - 1];
+  const currentRevenue = currentMonth.revenue;
+  const currentProfit = currentMonth.netProfit;
+  const currentLeads = currentMonth.leads;
 
   // Format annual data for chart
   const annualChartData = last12Months.map(m => ({
@@ -101,30 +102,30 @@ export default function AnalyticsPage() {
       {/* Main KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <KPICard
-          title="Revenue Anual (YTD)"
-          value={yearToDateRevenue}
-          change={18.5}
+          title="Revenue Mes Actual"
+          value={currentRevenue}
+          change={9.1}
           icon={DollarSign}
           format="currency"
         />
         <KPICard
-          title="Beneficio Neto (YTD)"
-          value={yearToDateProfit}
-          change={22.3}
+          title="Beneficio Neto Mes Actual"
+          value={currentProfit}
+          change={20.0}
           icon={TrendingUp}
           format="currency"
         />
         <KPICard
-          title="Margen Promedio"
+          title="Margen Promedio (12 meses)"
           value={avgMargin}
           change={3.8}
           icon={Target}
           format="percentage"
         />
         <KPICard
-          title="Leads Anuales"
-          value={yearToDateLeads}
-          change={12.1}
+          title="Leads Mes Actual"
+          value={currentLeads}
+          change={19.9}
           icon={Activity}
           format="number"
         />
@@ -245,7 +246,7 @@ export default function AnalyticsPage() {
             <CardDescription>Del visitante web al estudiante activo</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col items-center gap-3 py-4">
+            <div className="flex flex-col items-center gap-2 py-2">
               {mockConversionFunnel.map((funnel, index) => {
                 const dropoff = index > 0 ? ((mockConversionFunnel[index - 1].count - funnel.count) / mockConversionFunnel[index - 1].count) * 100 : 0;
 
@@ -270,12 +271,12 @@ export default function AnalyticsPage() {
                 const percentageDisplay = index === 0 ? '100%' : `(${funnel.percentage.toFixed(2)}%)`;
 
                 return (
-                  <div key={index} className="w-full space-y-2">
+                  <div key={index} className="w-full space-y-1">
                     {/* Labels outside trapezoid */}
-                    <div className="flex items-center justify-center gap-4 text-sm">
+                    <div className="flex items-center justify-center gap-3 text-xs">
                       <span className="font-semibold">{funnel.stage}</span>
-                      <span className="font-bold text-lg">{funnel.count.toLocaleString('es-CO')}</span>
-                      <span className="text-muted-foreground">{percentageDisplay}</span>
+                      <span className="font-bold text-sm">{funnel.count.toLocaleString('es-CO')}</span>
+                      <span className="text-muted-foreground text-xs">{percentageDisplay}</span>
                     </div>
 
                     {/* Funnel Stage Trapezoid */}
@@ -287,15 +288,15 @@ export default function AnalyticsPage() {
                         clipPath: index === mockConversionFunnel.length - 1
                           ? 'polygon(5% 0%, 95% 0%, 90% 100%, 10% 100%)'
                           : 'polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%)',
-                        height: '50px'
+                        height: '35px'
                       }}
                     />
 
                     {/* Drop-off indicator */}
                     {index > 0 && dropoff > 0 && (
-                      <div className="text-center py-1">
+                      <div className="text-center">
                         <p className="text-xs text-red-500 font-medium">
-                          ↓ {dropoff.toFixed(1)}% drop-off ({(mockConversionFunnel[index - 1].count - funnel.count).toLocaleString('es-CO')} perdidos)
+                          ↓ {dropoff.toFixed(1)}% ({(mockConversionFunnel[index - 1].count - funnel.count).toLocaleString('es-CO')} perdidos)
                         </p>
                       </div>
                     )}
