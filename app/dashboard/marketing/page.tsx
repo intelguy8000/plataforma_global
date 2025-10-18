@@ -14,7 +14,6 @@ import { Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveCo
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { formatCOP } from '@/lib/utils';
-import { Progress } from '@/components/ui/progress';
 
 export default function MarketingPage() {
   const marketingMetrics = getMarketingMetrics();
