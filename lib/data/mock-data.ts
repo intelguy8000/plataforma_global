@@ -105,7 +105,7 @@ export const mockAdvisors: Advisor[] = [
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Claudia',
     leadsCount: 92,
     conversionsCount: 13,
-    conversionRate: 14.1,
+    conversionRate: 14.5,
     revenue: 52_000_000, // ~$13k USD
     activeStudents: 11,
     joinedAt: new Date('2022-11-10')
@@ -153,7 +153,7 @@ export const mockAdvisors: Advisor[] = [
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carolina',
     leadsCount: 58,
     conversionsCount: 8,
-    conversionRate: 13.8,
+    conversionRate: 13.2,
     revenue: 32_000_000, // ~$8k USD
     activeStudents: 7,
     joinedAt: new Date('2023-06-22')
@@ -198,8 +198,21 @@ const generateLead = (index: number): Lead => {
   // Deterministic expected revenue using formula
   const expectedRevenue = 2_000_000 + ((index * 12347) % 6_000_000);
 
-  // Deterministic age
-  const age = 18 + ((index * 7) % 28);
+  // Realistic age distribution: 45% (18-22), 30% (23-27), 18% (28-35), 7% (36+)
+  let age: number;
+  if (index < 225) {
+    // 45% are 18-22
+    age = 18 + (index % 5);
+  } else if (index < 375) {
+    // Next 30% are 23-27
+    age = 23 + ((index - 225) % 5);
+  } else if (index < 465) {
+    // Next 18% are 28-35
+    age = 28 + ((index - 375) % 8);
+  } else {
+    // Last 7% are 36+
+    age = 36 + ((index - 465) % 10);
+  }
 
   // Deterministic phone number
   const phoneArea = 300 + (index % 51);
@@ -214,7 +227,10 @@ const generateLead = (index: number): Lead => {
     city: CITIES[index % CITIES.length],
     status,
     channel: CHANNELS[index % CHANNELS.length],
-    programType: PROGRAM_TYPES[index % PROGRAM_TYPES.length],
+    // Realistic program distribution: 35% english, 30% undergraduate, 28% masters, 7% phd
+    programType: index < 175 ? 'english' :
+                 index < 325 ? 'undergraduate' :
+                 index < 465 ? 'masters' : 'phd',
     targetCountry: COUNTRIES[index % COUNTRIES.length],
     advisorId: mockAdvisors[index % mockAdvisors.length].id,
     createdAt,
@@ -233,13 +249,50 @@ const generateLead = (index: number): Lead => {
 export const mockLeads: Lead[] = Array.from({ length: 500 }, (_, i) => generateLead(i));
 
 // Generate Students (converted leads) - Static deterministic data
+// Use student index (not lead index) to ensure proper distribution
 const convertedLeads = mockLeads.filter(lead => lead.status === 'converted');
 export const mockStudents: Student[] = convertedLeads.map((lead, index) => {
-  const age = lead.age || 18;
+  // Use STUDENT index for age distribution to ensure 45-30-18-7 split
+  let age: number;
+  if (index < 27) {
+    // 45% are 18-22 (27/60 = 45%)
+    age = 18 + (index % 5);
+  } else if (index < 45) {
+    // Next 30% are 23-27 (18/60 = 30%)
+    age = 23 + ((index - 27) % 5);
+  } else if (index < 56) {
+    // Next 18% are 28-35 (11/60 = 18%)
+    age = 28 + ((index - 45) % 8);
+  } else {
+    // Last 7% are 36+ (4/60 = 7%)
+    age = 36 + ((index - 56) % 10);
+  }
 
-  // Deterministic stage distribution
-  const stageIndex = index % 5;
-  const stage = PIPELINE_STAGES[stageIndex];
+  // Use STUDENT index for program distribution to ensure 35-30-28-7 split
+  let programType: ProgramType;
+  if (index < 21) {
+    programType = 'english'; // 35% (21/60)
+  } else if (index < 39) {
+    programType = 'undergraduate'; // 30% (18/60)
+  } else if (index < 56) {
+    programType = 'masters'; // 28% (17/60)
+  } else {
+    programType = 'phd'; // 7% (4/60)
+  }
+
+  // Realistic stage distribution: 15% docs, 20% application, 25% visa, 20% payment, 20% active
+  let stage: PipelineStage;
+  if (index < 9) {
+    stage = 'documentation'; // 15% (9/60)
+  } else if (index < 21) {
+    stage = 'application'; // 20% (12/60)
+  } else if (index < 36) {
+    stage = 'visa'; // 25% (15/60)
+  } else if (index < 48) {
+    stage = 'payment'; // 20% (12/60)
+  } else {
+    stage = 'active'; // 20% (12/60)
+  }
 
   // Deterministic graduation status (30% graduated from active stage)
   const isGraduated = stage === 'active' && (index % 10) >= 7;
@@ -266,9 +319,9 @@ export const mockStudents: Student[] = convertedLeads.map((lead, index) => {
   const lastUpdated = new Date(Date.now() - lastUpdatedDaysAgo * 24 * 60 * 60 * 1000);
 
   // Program duration in days
-  const programDuration = lead.programType === 'english' ? 180 :
-                         lead.programType === 'undergraduate' ? 1460 :
-                         lead.programType === 'masters' ? 730 : 1460;
+  const programDuration = programType === 'english' ? 180 :
+                         programType === 'undergraduate' ? 1460 :
+                         programType === 'masters' ? 730 : 1460;
 
   return {
     id: `student-${index + 1}`,
@@ -277,7 +330,7 @@ export const mockStudents: Student[] = convertedLeads.map((lead, index) => {
     email: lead.email,
     city: lead.city,
     stage,
-    programType: lead.programType,
+    programType,
     targetCountry: lead.targetCountry,
     university: UNIVERSITIES[index % UNIVERSITIES.length],
     advisorId: lead.advisorId,
@@ -482,8 +535,30 @@ export const mockWebMetrics: WebMetric[] = Array.from({ length: 30 }, (_, i) => 
   // Deterministic session duration
   const avgSessionDuration = 120 + ((i * 19) % 301);
 
-  // Deterministic conversion rate
-  const conversionRate = (2 + ((i * 7) % 7)) / 10;
+  // Realistic conversion rate with day-of-week and campaign variations
+  const dayOfWeek = (29 - i) % 7; // 0=Sunday, 6=Saturday
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+  const isCampaignDay = i % 9 === 0; // Simulate campaign peaks every 9 days
+
+  let baseConversionRate = 1.8; // Base 1.8%
+
+  // Weekend reduction
+  if (isWeekend) {
+    baseConversionRate *= 0.4; // 40% of normal (0.72%)
+  }
+  // Tuesday-Thursday boost
+  else if (dayOfWeek >= 2 && dayOfWeek <= 4) {
+    baseConversionRate *= 1.3; // 30% boost (2.34%)
+  }
+
+  // Campaign spike
+  if (isCampaignDay && !isWeekend) {
+    baseConversionRate *= 1.8; // 80% boost during campaigns
+  }
+
+  // Add natural daily variation ±20%
+  const randomVariation = (((i * 17) % 40) - 20) / 100; // -0.2 to +0.2
+  const conversionRate = baseConversionRate * (1 + randomVariation);
 
   return {
     date,

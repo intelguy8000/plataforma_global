@@ -189,7 +189,7 @@ export default function StudentsPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">{metric.metric}</span>
-                      <Badge variant={isAboveBenchmark ? 'default' : 'secondary'}>
+                      <Badge variant={metric.trend === 'up' ? 'default' : 'destructive'} className={metric.trend === 'down' ? 'bg-red-500 hover:bg-red-600' : ''}>
                         {metric.trend === 'up' ? '↑' : '↓'}
                       </Badge>
                     </div>

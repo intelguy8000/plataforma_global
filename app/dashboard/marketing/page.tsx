@@ -10,7 +10,7 @@ import {
   mockChannelMetrics,
   mockLeads
 } from '@/lib/data/mock-data';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, ComposedChart } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { formatCOP } from '@/lib/utils';
@@ -19,11 +19,11 @@ import { Progress } from '@/components/ui/progress';
 export default function MarketingPage() {
   const marketingMetrics = getMarketingMetrics();
 
-  // Format web metrics for chart
+  // Format web metrics for chart with short date format
   const webTrafficData = mockWebMetrics.slice(-14).map(metric => ({
-    date: metric.date.getDate(),
+    date: `${metric.date.getDate()}/${metric.date.getMonth() + 1}`,
     visits: metric.visits,
-    conversions: Math.floor(metric.visits * metric.conversionRate / 100)
+    conversionRate: metric.conversionRate // Conversion rate as percentage
   }));
 
   // Channel distribution for pie chart
@@ -107,18 +107,32 @@ export default function MarketingPage() {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={webTrafficData}>
+            <ComposedChart data={webTrafficData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis
                 dataKey="date"
                 className="text-xs"
-                tickFormatter={(value) => `Día ${value}`}
               />
-              <YAxis className="text-xs" />
+              <YAxis
+                yAxisId="left"
+                className="text-xs"
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                className="text-xs"
+                tickFormatter={(value) => `${value}%`}
+              />
               <Tooltip
+                formatter={(value: number, name: string) => {
+                  if (name === 'Tasa de Conversión (%)') return [`${value.toFixed(1)}%`, 'Tasa de Conversión'];
+                  return [value, 'Visitas'];
+                }}
                 contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
               />
+              <Legend />
               <Line
+                yAxisId="left"
                 type="monotone"
                 dataKey="visits"
                 stroke="#3B82F6"
@@ -127,14 +141,15 @@ export default function MarketingPage() {
                 name="Visitas"
               />
               <Line
+                yAxisId="right"
                 type="monotone"
-                dataKey="conversions"
+                dataKey="conversionRate"
                 stroke="#10B981"
                 strokeWidth={2}
                 dot={{ fill: '#10B981', r: 4 }}
-                name="Conversiones"
+                name="Tasa de Conversión (%)"
               />
-            </LineChart>
+            </ComposedChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>

@@ -154,8 +154,8 @@ export default function AnalyticsPage() {
               />
               <Tooltip
                 formatter={(value: number, name: string) => {
-                  if (name === 'margin') return [`${value.toFixed(1)}%`, 'Margen'];
-                  return [`$${value.toFixed(0)}M`, name === 'revenue' ? 'Revenue' : name === 'costs' ? 'Costos' : 'Beneficio'];
+                  if (name === 'Margen %') return [`${value.toFixed(1)}%`, 'Margen'];
+                  return [`$${value.toFixed(0)}M`, name === 'Revenue' ? 'Revenue' : name === 'Costos' ? 'Costos' : 'Beneficio'];
                 }}
                 contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
               />
