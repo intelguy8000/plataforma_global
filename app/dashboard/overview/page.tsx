@@ -23,9 +23,9 @@ export default function OverviewPage() {
   const topAdvisors = getTopAdvisors(5);
   const yoyData = getYoYComparison();
 
-  // Format data for revenue chart
+  // Format data for revenue chart with short date format (day/month)
   const revenueChartData = mockLast30DaysMetrics.map(metric => ({
-    date: metric.date.getDate(),
+    date: `${metric.date.getDate()}/${metric.date.getMonth() + 1}`,
     revenue: metric.revenue
   }));
 
@@ -147,7 +147,6 @@ export default function OverviewPage() {
               <XAxis
                 dataKey="date"
                 className="text-xs"
-                tickFormatter={(value) => `${value}`}
               />
               <YAxis
                 className="text-xs"
@@ -155,7 +154,6 @@ export default function OverviewPage() {
               />
               <Tooltip
                 formatter={(value: number) => [formatCOP(value), 'Revenue']}
-                labelFormatter={(label) => `Día ${label}`}
                 contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
               />
               <Line
