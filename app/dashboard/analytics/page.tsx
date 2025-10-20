@@ -328,6 +328,7 @@ export default function AnalyticsPage() {
                   }}
                   contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
                 />
+                <Legend />
                 <Line
                   type="monotone"
                   dataKey="revenue"
