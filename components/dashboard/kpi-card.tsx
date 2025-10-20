@@ -8,9 +8,10 @@ interface KPICardProps {
   change: number;
   icon: LucideIcon;
   format?: 'currency' | 'number' | 'percentage';
+  subtitle?: string; // Optional subtitle next to the value
 }
 
-export function KPICard({ title, value, change, icon: Icon, format = 'number' }: KPICardProps) {
+export function KPICard({ title, value, change, icon: Icon, format = 'number', subtitle }: KPICardProps) {
   const isPositive = change > 0;
   const isNeutral = change === 0;
 
@@ -36,7 +37,14 @@ export function KPICard({ title, value, change, icon: Icon, format = 'number' }:
         <Icon className="h-5 w-5 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{formatValue(value)}</div>
+        <div className="flex items-baseline gap-2">
+          <div className="text-2xl font-bold">{formatValue(value)}</div>
+          {subtitle && (
+            <div className="text-lg font-semibold text-muted-foreground">
+              {subtitle}
+            </div>
+          )}
+        </div>
         <div className="flex items-center gap-1 text-xs mt-2">
           {isNeutral ? (
             <Minus className="h-4 w-4 text-muted-foreground" />

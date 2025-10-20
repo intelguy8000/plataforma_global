@@ -41,6 +41,7 @@ export default function AnalyticsPage() {
   const currentRevenue = currentMonth.revenue;
   const currentProfit = currentMonth.netProfit;
   const currentLeads = currentMonth.leads;
+  const netMarginPercentage = (currentProfit / currentRevenue) * 100; // Margen neto
 
   // Format annual data for chart
   const annualChartData = last12Months.map(m => ({
@@ -114,6 +115,7 @@ export default function AnalyticsPage() {
           change={20.0}
           icon={TrendingUp}
           format="currency"
+          subtitle={`(${netMarginPercentage.toFixed(1)}%)`}
         />
         <KPICard
           title="Margen Promedio (12 meses)"
