@@ -231,3 +231,155 @@ export interface ExecutiveKPI {
   achievement: number; // percentage
   trend: 'up' | 'down' | 'neutral';
 }
+
+// ============================================
+// NUEVOS TIPOS PARA MÓDULOS ADICIONALES
+// ============================================
+
+// User Management Types
+export type UserRole = 'admin' | 'manager' | 'advisor' | 'marketing';
+export type UserStatus = 'active' | 'inactive' | 'pending';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  status: UserStatus;
+  avatar?: string;
+  department?: string;
+  phone?: string;
+  lastLogin?: Date;
+  createdAt: Date;
+  permissions: UserPermissions;
+}
+
+export interface UserPermissions {
+  viewDashboard: boolean;
+  viewSales: boolean;
+  viewMarketing: boolean;
+  viewStudents: boolean;
+  viewAnalytics: boolean;
+  manageUsers: boolean;
+  manageIntegrations: boolean;
+  viewSystemArchitecture: boolean;
+  exportData: boolean;
+  configureAlerts: boolean;
+}
+
+// System Architecture Types
+export type SystemStatus = 'online' | 'degraded' | 'offline';
+export type SyncStatus = 'synced' | 'syncing' | 'error' | 'pending';
+
+export interface SystemComponent {
+  id: string;
+  name: string;
+  type: 'database' | 'api' | 'service' | 'integration';
+  status: SystemStatus;
+  uptime: number; // percentage
+  lastSync?: Date;
+  responseTime: number; // milliseconds
+  description: string;
+  dependencies?: string[]; // IDs of other components
+}
+
+export interface DataSyncLog {
+  id: string;
+  componentId: string;
+  timestamp: Date;
+  status: SyncStatus;
+  recordsProcessed: number;
+  duration: number; // seconds
+  errorMessage?: string;
+}
+
+export interface SystemMetrics {
+  uptime: number;
+  totalRequests: number;
+  avgResponseTime: number;
+  errorRate: number;
+  lastSyncTime: Date;
+  nextSyncTime: Date;
+  dataFreshness: number; // hours since last sync
+}
+
+// Alerts and Notifications Types
+export type AlertSeverity = 'critical' | 'warning' | 'info';
+export type AlertCategory = 'system' | 'business' | 'student' | 'financial';
+export type AlertStatus = 'unread' | 'read' | 'resolved';
+
+export interface Alert {
+  id: string;
+  title: string;
+  message: string;
+  severity: AlertSeverity;
+  category: AlertCategory;
+  status: AlertStatus;
+  timestamp: Date;
+  resolvedAt?: Date;
+  resolvedBy?: string;
+  actionUrl?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface AlertConfig {
+  id: string;
+  name: string;
+  category: AlertCategory;
+  enabled: boolean;
+  conditions: {
+    metric: string;
+    operator: 'greater_than' | 'less_than' | 'equals';
+    threshold: number;
+  };
+  notifications: {
+    email: boolean;
+    inApp: boolean;
+    sms: boolean;
+  };
+}
+
+// Integrations Types
+export type IntegrationType = 'database' | 'crm' | 'payment' | 'messaging' | 'email';
+export type IntegrationStatus = 'connected' | 'disconnected' | 'error' | 'configuring';
+
+export interface Integration {
+  id: string;
+  name: string;
+  type: IntegrationType;
+  provider: string;
+  status: IntegrationStatus;
+  lastSync?: Date;
+  syncFrequency: string; // e.g., "Every 8 hours"
+  recordsSynced: number;
+  configuration: {
+    apiKey?: string;
+    endpoint?: string;
+    database?: string;
+    enabled: boolean;
+  };
+  healthCheck: {
+    status: SystemStatus;
+    lastChecked: Date;
+    latency: number;
+  };
+}
+
+// System Health Types
+export interface HealthMetric {
+  name: string;
+  value: number;
+  unit: string;
+  status: 'healthy' | 'warning' | 'critical';
+  threshold: number;
+  description: string;
+}
+
+export interface ServiceHealth {
+  serviceName: string;
+  status: SystemStatus;
+  uptime: number;
+  responseTime: number;
+  lastIncident?: Date;
+  metrics: HealthMetric[];
+}

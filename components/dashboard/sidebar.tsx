@@ -9,7 +9,12 @@ import {
   Users,
   BarChart3,
   Moon,
-  Sun
+  Sun,
+  Bell,
+  Shield,
+  Network,
+  Plug,
+  Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -22,6 +27,11 @@ const navigation = [
   { name: 'Marketing', href: '/dashboard/marketing', icon: TrendingUp },
   { name: 'Estudiantes', href: '/dashboard/students', icon: Users },
   { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+  { name: 'Alertas', href: '/dashboard/alertas', icon: Bell, badge: 4 },
+  { name: 'Usuarios', href: '/dashboard/usuarios', icon: Shield },
+  { name: 'Arquitectura', href: '/dashboard/arquitectura', icon: Network },
+  { name: 'Integraciones', href: '/dashboard/integraciones', icon: Plug },
+  { name: 'Salud del Sistema', href: '/dashboard/salud', icon: Activity },
 ];
 
 export function Sidebar() {
