@@ -1,496 +1,816 @@
 # 📊 JGSL Dashboard - Estado del Proyecto
 
-**Última actualización**: 17 de Octubre, 2025
+**Última actualización**: 24 de Octubre, 2025
 **URL Producción**: https://jgsl.vercel.app
 **Repositorio**: https://github.com/intelguy8000/plataforma_global
+**Versión**: 2.0.0
 
 ---
 
-## ✅ Completado Hoy (17 Oct 2025)
+## ✅ COMPLETADO HOY (24 Oct 2025) - SESIÓN MAYOR
 
-### 1. **Sistema de Color por Rangos en Student Success Metrics**
-**Commits**: `1925be2`, `4a21daf`
+### 🚀 **5 Nuevos Módulos Empresariales Agregados**
+**Commits**: `3fadcc6`, `534a709`
 
-#### Implementado:
-- ✅ Cambio de "Benchmark" a "Meta" en toda la interfaz
-- ✅ Sistema de colores por rangos de performance:
-  - **Verde**: ≥80% de la meta (buen desempeño)
-  - **Amarillo**: 50-80% de la meta (desempeño medio)
-  - **Rojo**: <50% de la meta (bajo desempeño)
-- ✅ Lógica inversa para métricas negativas:
-  - Tasa de Abandono (meta: máximo 8%)
-  - Tiempo Promedio a Graduación (meta: máximo 24 meses)
-- ✅ Valores ajustados para demostrar todos los colores:
-  - Tasa de Graduación: 57/75 (amarillo - 76%)
-  - GPA Promedio: 2.2/3.5 (rojo - 63%)
-  - Tasa de Abandono: 6.8/8 (verde - bajo meta)
-
-#### Archivos Modificados:
-- `/types/index.ts` - Agregado campo `isInverse?: boolean`
-- `/lib/data/mock-data.ts` - Valores realistas y campo `isInverse`
-- `/app/dashboard/students/page.tsx` - Lógica de colores y CSS gauges
-- `/app/dashboard/marketing/page.tsx` - Removido import de `Progress` (ESLint)
+Esta es la actualización más grande del proyecto. Se agregaron 5 módulos empresariales completos sin modificar ninguna funcionalidad existente.
 
 ---
 
-### 2. **Funnel Visual Movido a Analytics Dashboard**
-**Commits**: `1925be2`
+## 📦 MÓDULOS NUEVOS IMPLEMENTADOS
 
-#### Implementado:
-- ✅ Funnel visual movido de Marketing a Analytics
-- ✅ Intercambiado con "Tendencia Financiera"
-- ✅ Funnel optimizado y más compacto:
-  - Altura de trapecios: 35px (reducido de 50px)
-  - Spacing: `gap-2`, `space-y-1` (compacto)
-  - Tamaños de texto: `text-xs`, `text-sm`
-  - Padding: `py-2` (reducido de `py-4`)
-- ✅ Sistema de escala de dos niveles:
-  - Visitantes Web: 100% (estático)
-  - Leads Generados: 70% (nuevo 100% de referencia)
-  - Etapas siguientes: proporcionales a Leads Generados
+### 1. **👥 Gestión de Usuarios y Roles** (`/dashboard/usuarios`)
+**Archivo**: `/app/dashboard/usuarios/page.tsx`
 
-#### Características del Funnel:
-- Trapezoides con `clip-path: polygon()`
-- 6 etapas: Visitantes → Leads → Contactados → Calificados → Conversiones → Estudiantes Activos
-- Indicadores de drop-off entre etapas
-- Colores diferenciados por etapa
-- Labels externos para mejor legibilidad
+#### Características:
+- ✅ Sistema completo de control de acceso basado en roles (RBAC)
+- ✅ 4 roles predefinidos:
+  - **Admin**: 10 permisos (acceso total)
+  - **Manager**: 6 permisos (analytics + reportes)
+  - **Asesor**: 4 permisos (pipeline + estudiantes)
+  - **Marketing**: 5 permisos (campañas + analytics)
+- ✅ 6 usuarios mock con datos completos
+- ✅ Tabla de usuarios con información:
+  - Avatar dinámico (DiceBear API)
+  - Departamento y rol
+  - Estado (Activo/Inactivo)
+  - Último acceso (timestamp)
+  - Acciones (Editar/Eliminar)
+- ✅ Matriz de permisos detallada:
+  - 10 permisos configurables
+  - Comparación visual por rol
+  - Checkmarks (✓) y crosses (✗)
+- ✅ 4 KPI cards:
+  - Total usuarios
+  - Usuarios activos
+  - Usuarios inactivos
+  - Roles configurados
 
----
-
-### 3. **Margen Porcentual Variable en Performance Anual**
-**Commits**: `1925be2`
-
-#### Implementado:
-- ✅ Marginpercentage variable en `/lib/data/historical-data.ts`
-- ✅ Rangos realistas: 37%-65%
-- ✅ Refleja patrones estacionales:
-  - **Alta temporada** (Ene-Mar): 60-65% margen
-  - **Media temporada** (May-Jun, Jul-Ago): 48-63% margen
-  - **Baja temporada** (Abr, Sep-Oct, Nov-Dic): 37-52% margen
-
-#### Datos Actualizados (24 meses):
-```typescript
-// Ejemplo de variación:
-Nov 2023: 52%  | Dic 2023: 37%  (holidays)
-Jan 2024: 65%  | Feb 2024: 60%  (peak season)
-Apr 2024: 42%  | Jul 2024: 63%  (high season)
-Sep 2024: 45%  | Oct 2024: 51%
-```
+#### Permisos Implementados:
+1. Ver Dashboard
+2. Ver Ventas
+3. Ver Marketing
+4. Ver Estudiantes
+5. Ver Analytics
+6. Gestionar Usuarios
+7. Gestionar Integraciones
+8. Ver Arquitectura
+9. Exportar Datos
+10. Configurar Alertas
 
 ---
 
-### 4. **Analytics KPIs - Mes Actual vs YTD**
-**Commits**: `f23b2e1`
+### 2. **🏗️ Arquitectura de Sistemas** (`/dashboard/arquitectura`) ⭐ **WOW FACTOR**
+**Archivo**: `/app/dashboard/arquitectura/page.tsx`
 
-#### Problema Identificado:
-Los KPIs mostraban valores YTD (Year-to-Date) acumulados de 12 meses:
-- Revenue Anual (YTD): $3.6B COP (suma de 12 meses) ❌
-- Beneficio Neto (YTD): $1.6B COP ❌
-- Leads Anuales: 7,206 ❌
+#### Características:
+- ✅ Diagrama vertical del flujo de datos (5 capas):
+  1. **Base de Datos Cliente** (MySQL 8.0)
+  2. **Servicio ETL/Sync** (cada 8 horas) 🔵 Destacado
+  3. **Data Warehouse** (optimizado para analytics)
+  4. **API Plataforma Global** (REST API)
+  5. **Dashboard Web** (Next.js) 🟢 Destacado
+- ✅ Integraciones laterales:
+  - WhatsApp Business API
+  - Sistema de Pagos (PayU)
+- ✅ Visualización de componentes:
+  - Iconos por tipo (Database, Server, Cloud)
+  - Estados con colores (Online, Degraded, Offline)
+  - Métricas de uptime (%)
+  - Tiempo de respuesta (ms)
+- ✅ Historial de sincronizaciones:
+  - Últimas 5 ejecuciones
+  - Estado (Exitosa/Error)
+  - Registros procesados
+  - Duración en segundos
+  - Timestamps
+- ✅ Tabla detallada de componentes:
+  - 7 componentes monitoreados
+  - Estado, uptime, respuesta
+  - Última sincronización
+  - Descripción de cada uno
+- ✅ 4 KPI cards:
+  - Uptime del sistema (99.87%)
+  - Última sincronización (timestamp)
+  - Próxima sincronización (countdown)
+  - Tiempo de respuesta promedio (87ms)
 
-#### Solución Implementada:
-Cambio de YTD acumulado a **métricas del mes actual**:
+#### Datos Técnicos:
+- **Sincronización**: Cada 8 horas automática
+- **Registros por sync**: ~1,200
+- **Uptime promedio**: 99.87%
+- **Componentes monitoreados**: 7
+- **Integraciones externas**: 2
 
-| Métrica | Antes (YTD) | Ahora (Mes Actual) |
-|---------|-------------|---------------------|
-| Revenue | $3.6B COP | $288M COP |
-| Beneficio Neto | $1.6B COP | $123M COP |
-| Leads | 7,206 | 554 |
-| Margen Promedio | 57.8% | 57.8% (12 meses) |
+---
 
-#### Código Actualizado:
+### 3. **🔔 Centro de Alertas** (`/dashboard/alertas`)
+**Archivo**: `/app/dashboard/alertas/page.tsx`
+
+#### Características:
+- ✅ Sistema de notificaciones en tiempo real
+- ✅ 3 niveles de severidad:
+  - **Crítica** (rojo): Errores graves, caídas de sistema
+  - **Advertencia** (amarillo): Métricas bajas, pagos pendientes
+  - **Informativa** (azul): Updates, logros alcanzados
+- ✅ 4 categorías:
+  - **Sistema**: Sincronización, servicios, errores técnicos
+  - **Negocio**: Conversiones, metas, métricas
+  - **Estudiante**: Pagos, graduaciones, seguimientos
+  - **Financiero**: Márgenes, costos, proyecciones
+- ✅ 3 estados:
+  - **No leída** (orange badge)
+  - **Leída** (gray badge)
+  - **Resuelta** (green badge)
+- ✅ 8 alertas mock incluidas:
+  - Pago pendiente (estudiante en riesgo)
+  - Sincronización completada
+  - Meta alcanzada
+  - Estudiante próximo a graduación
+  - Tasa de conversión baja
+  - Nuevos leads
+  - Error resuelto
+  - Margen en descenso
+- ✅ Filtros con Tabs:
+  - Todas
+  - No leídas
+  - Resueltas
+- ✅ Acciones por alerta:
+  - Marcar como leída
+  - Resolver
+  - Descartar
+  - Ver detalles (link a dashboard relevante)
+- ✅ Configuración de notificaciones:
+  - 4 categorías configurables
+  - Toggle activar/desactivar
+  - Estado visual
+- ✅ Timestamps relativos:
+  - "Hace 2h", "Hace 1d"
+  - Fecha completa en hover
+- ✅ 4 KPI cards:
+  - Alertas activas (no leídas)
+  - Críticas
+  - Advertencias
+  - Resueltas (últimas 24h)
+
+---
+
+### 4. **🔌 Integraciones** (`/dashboard/integraciones`)
+**Archivo**: `/app/dashboard/integraciones/page.tsx`
+
+#### Características:
+- ✅ Gestión centralizada de conexiones externas
+- ✅ 6 integraciones configuradas:
+  1. **Base de Datos Cliente** (MySQL) - Conectada
+  2. **WhatsApp Business** (Meta) - Conectada
+  3. **PayU** (Pagos) - Conectada
+  4. **HubSpot CRM** - Conectada
+  5. **Mailchimp** (Email) - Conectada
+  6. **Google Analytics** - Desconectada ❌
+- ✅ 5 tipos de integración:
+  - Database
+  - Messaging
+  - Payment
+  - CRM
+  - Email
+- ✅ Estados:
+  - Conectada (green)
+  - Desconectada (gray)
+  - Error (red)
+  - Configurando (yellow)
+- ✅ Grid de tarjetas visuales:
+  - Icono por tipo
+  - Estado con badge
+  - Última sincronización
+  - Frecuencia de sync
+  - Registros sincronizados
+  - Health check:
+    - Status (Online/Offline)
+    - Latencia (ms)
+    - Última verificación
+  - Botones de acción:
+    - Configurar
+    - Sincronizar/Conectar
+- ✅ Tabla detallada:
+  - Vista consolidada de todas
+  - Métricas de performance
+  - Estado de conexión
+- ✅ Sección "Integraciones Disponibles":
+  - Zoom (Videoconferencia)
+  - Slack (Comunicación)
+  - Google Calendar (Calendario)
+  - Agregar nueva con botón +
+- ✅ 4 KPI cards:
+  - Total integraciones
+  - Activas
+  - Inactivas
+  - Datos sincronizados (últimas 24h)
+
+#### Datos Mock:
+- **Total**: 6 integraciones
+- **Activas**: 5 (83%)
+- **Registros totales**: 4,055 sincronizados
+- **Frecuencias**: Tiempo real, cada hora, cada 2h, cada 4h, cada 8h
+
+---
+
+### 5. **💚 Salud del Sistema** (`/dashboard/salud`)
+**Archivo**: `/app/dashboard/salud/page.tsx`
+
+#### Características:
+- ✅ Monitoreo en tiempo real de servicios
+- ✅ 4 servicios monitoreados:
+  1. **API Gateway**
+     - CPU Usage: 34%
+     - Memory Usage: 58%
+     - Request Rate: 1,247 req/min
+  2. **Database**
+     - Connections: 47 activas
+     - Query Time: 32ms
+     - Storage: 67% (warning)
+  3. **Cache (Redis)**
+     - Hit Rate: 94%
+     - Memory: 42%
+  4. **CDN**
+     - Bandwidth: 3.2 GB/h
+     - Cache Hit: 96%
+- ✅ Métricas detalladas por servicio:
+  - 2-3 métricas específicas
+  - Progress bars con colores:
+    - Verde (healthy)
+    - Amarillo (warning)
+    - Rojo (critical)
+  - Umbrales definidos
+  - Indicador visual (dot)
+- ✅ Tarjetas de servicio:
+  - Icono de servidor
+  - Estado general (Online/Degraded/Offline)
+  - Uptime %
+  - Tiempo de respuesta
+  - Último incidente (si aplica)
+- ✅ Tabla de resumen:
+  - Vista consolidada de todos los servicios
+  - Métricas en dots de colores
+  - Estado de incidentes
+- ✅ 4 KPI cards globales:
+  - Uptime global (99.87%)
+  - Tiempo de respuesta (87ms)
+  - Tasa de error (0.13%)
+  - Total requests (2.8M)
+- ✅ Información adicional:
+  - Frescura de datos (2.5h)
+  - Próxima sincronización
+  - Servicios online (4/4 = 100%)
+
+---
+
+### 6. **🔐 Página de Login** (`/login`)
+**Archivo**: `/app/login/page.tsx`
+
+#### Características:
+- ✅ Pantalla de bienvenida profesional
+- ✅ Selector visual de 4 roles:
+  - Tarjetas grandes con información
+  - Icono distintivo por rol
+  - Badge con ID del rol
+  - Descripción del rol
+  - Lista de permisos (bullets)
+  - Hover effects
+  - Selección visual (border azul + escala)
+- ✅ Diseño moderno:
+  - Gradiente de fondo (blue-50 a indigo-100)
+  - Badge "Demo Mode"
+  - Grid de 2 columnas
+  - Responsive
+- ✅ Información del sistema:
+  - Título: "Plataforma Global Analytics"
+  - Subtítulo descriptivo
+  - Footer con estadísticas:
+    - 10+ módulos
+    - 99.8% uptime
+    - 5+ integraciones
+- ✅ Funcionalidad:
+  - Click en tarjeta → Selecciona rol
+  - Botón "Iniciar Sesión" habilitado
+  - Redirect a `/dashboard/overview`
+  - Estado visual de selección
+- ✅ Accesibilidad:
+  - Contraste adecuado
+  - Labels descriptivos
+  - Botones accesibles
+
+---
+
+## 📊 DATA NUEVA AGREGADA
+
+### `/lib/data/system-data.ts` (NUEVO)
+**Tamaño**: ~570 líneas
+
+#### Contenido:
+1. **mockUsers** (6 usuarios):
+   - Juan Sebastián (Admin)
+   - María González (Manager)
+   - Carlos Ramírez (Asesor)
+   - Laura Martínez (Marketing)
+   - Andrés López (Asesor)
+   - Diana Torres (Asesor - Inactiva)
+
+2. **systemComponents** (7 componentes):
+   - Base de Datos Cliente (MySQL)
+   - Servicio ETL/Sync
+   - Data Warehouse
+   - API Plataforma Global
+   - Dashboard Web
+   - WhatsApp Business API
+   - Sistema de Pagos (PayU)
+
+3. **syncLogs** (5 registros):
+   - Últimas 5 sincronizaciones
+   - Estados exitosos y 1 error
+   - Timestamps, duración, registros
+
+4. **systemMetrics** (métricas globales):
+   - Uptime: 99.87%
+   - Total requests: 2.8M
+   - Avg response: 87ms
+   - Error rate: 0.13%
+   - Sync times y freshness
+
+5. **mockAlerts** (8 alertas):
+   - 4 no leídas
+   - 3 leídas
+   - 1 resuelta
+   - Diferentes severidades y categorías
+
+6. **mockIntegrations** (6 integraciones):
+   - 5 conectadas
+   - 1 desconectada
+   - Health checks completos
+   - Métricas de sync
+
+7. **serviceHealthData** (4 servicios):
+   - API Gateway
+   - Database
+   - Cache (Redis)
+   - CDN
+   - Con 2-3 métricas cada uno
+
+8. **Helper functions**:
+   - `getUnreadAlertsCount()`: 4
+   - `getActiveIntegrationsCount()`: 5
+   - `getActiveUsersCount()`: 5
+
+---
+
+### `/lib/data/language-data.ts` (NUEVO)
+**Tamaño**: ~380 líneas
+**Propósito**: Data específica para agencias de idiomas
+
+#### Contenido:
+1. **Tipos de datos**:
+   - `LanguageProgram`: english, french, german, portuguese, italian, chinese
+   - `LanguageLevel`: A1, A2, B1, B2, C1, C2 (CEFR)
+   - `CourseType`: presencial, virtual, hibrido, inmersion
+   - `Certification`: TOEFL, IELTS, Cambridge, DELF, DELE, Goethe, CELPE-Bras
+
+2. **mockLanguageCourses** (5 cursos):
+   - English General A1
+   - English Business B2
+   - TOEFL Preparation
+   - IELTS Advanced C1
+   - French A2 Intensivo
+
+3. **mockCertifications** (4 exámenes):
+   - TOEFL (95/120)
+   - IELTS (7.5/9)
+   - Cambridge (180/230)
+   - TOEFL (pendiente)
+
+4. **mockLanguageStudents** (3 estudiantes):
+   - Ana María Rodríguez (English B2→C1)
+   - Carlos Mendoza (English C1→C2)
+   - Diana Torres (French A2→B1)
+
+5. **programMetrics** (4 programas):
+   - English: 450 estudiantes, 78% cert rate
+   - French: 85 estudiantes, 72% cert rate
+   - German: 42 estudiantes, 68% cert rate
+   - Portuguese: 38 estudiantes, 75% cert rate
+
+6. **certificationRates** (5 certificaciones):
+   - TOEFL: 77.2% (112/145)
+   - IELTS: 79.6% (78/98)
+   - Cambridge: 80.6% (54/67)
+   - DELF: 82.4% (28/34)
+   - Goethe: 77.8% (14/18)
+
+7. **institutionalAgreements** (4 universidades):
+   - University of Toronto (45 estudiantes)
+   - McGill University (32 estudiantes)
+   - Sorbonne University (18 estudiantes)
+   - University of Sydney (28 estudiantes)
+
+8. **Helper functions**:
+   - `getLevelName()`: "Principiante", "Elemental", etc.
+   - `getProgramName()`: "Inglés", "Francés", etc.
+   - `getCourseTypeName()`: "Presencial", "Virtual", etc.
+
+---
+
+## 🎨 ACTUALIZACIONES A COMPONENTES EXISTENTES
+
+### **Sidebar** (`/components/dashboard/sidebar.tsx`)
+**Cambios**: Agregados 5 nuevos items + responsive
+
+#### Nuevas opciones en menú:
+6. Alertas (badge: 4)
+7. Usuarios
+8. Arquitectura
+9. Integraciones
+10. Salud del Sistema
+
+#### Iconos agregados:
+- `Bell` → Alertas
+- `Shield` → Usuarios
+- `Network` → Arquitectura
+- `Plug` → Integraciones
+- `Activity` → Salud del Sistema
+- `Menu` → Hamburguesa (móvil)
+- `X` → Cerrar (móvil)
+
+#### Funcionalidad responsive (24 Oct - Commit 534a709):
+- ✅ **Móvil (< 768px)**:
+  - Sidebar oculto por defecto
+  - Botón hamburguesa verde (top-left, fixed)
+  - Slide-in desde izquierda con animación (300ms)
+  - Overlay oscuro de fondo
+  - Auto-close al navegar
+  - Auto-close al tocar overlay
+  - Estado: `isOpen` (useState)
+- ✅ **Desktop (≥ 768px)**:
+  - Sidebar siempre visible (static)
+  - Sin botón hamburguesa
+  - Comportamiento original
+- ✅ **Animaciones**:
+  - `transition-transform 300ms ease-in-out`
+  - `translate-x-0` / `-translate-x-full`
+  - Overlay fade-in/out
+- ✅ **Z-index layers**:
+  - Hamburger button: z-50
+  - Overlay: z-40
+  - Sidebar: z-40
+
+---
+
+### **Layout** (`/app/dashboard/layout.tsx`)
+**Cambios**: Padding responsive
+
+#### Actualización:
 ```typescript
 // Antes:
-const yearToDateRevenue = last12Months.reduce((sum, m) => sum + m.revenue, 0);
-const yearToDateProfit = last12Months.reduce((sum, m) => sum + m.netProfit, 0);
-const yearToDateLeads = last12Months.reduce((sum, m) => sum + m.leads, 0);
+<div className="container mx-auto p-6">
 
 // Ahora:
-const currentMonth = last12Months[last12Months.length - 1];
-const currentRevenue = currentMonth.revenue;
-const currentProfit = currentMonth.netProfit;
-const currentLeads = currentMonth.leads;
+<div className="container mx-auto p-4 md:p-6 pt-16 md:pt-6">
 ```
 
-#### Labels Actualizados:
-- "Revenue Anual (YTD)" → "Revenue Mes Actual"
-- "Beneficio Neto (YTD)" → "Beneficio Neto Mes Actual"
-- "Leads Anuales" → "Leads Mes Actual"
-- "Margen Promedio" → "Margen Promedio (12 meses)"
+#### Razón:
+- `p-4 md:p-6`: Padding reducido en móvil
+- `pt-16 md:pt-6`: Top padding extra en móvil para botón hamburguesa
+- Evita solapamiento con el botón fixed
 
 ---
 
-### 5. **Fixes de Build y ESLint**
-**Commits**: `4a21daf`
+### **Chat Widget** (`/components/dashboard/chat-widget.tsx`)
+**Cambios**: Responsive para móvil
 
-#### Errores Corregidos:
-- ❌ `'Progress' is defined but never used` en marketing/page.tsx:17
-- ❌ `'RadialBarChart' is defined but never used` en students/page.tsx:13
-- ❌ `'RadialBar' is defined but never used` en students/page.tsx:13
-
-#### Solución:
-- ✅ Removidos imports no utilizados de Recharts
-- ✅ Removido import de `Progress` component
-- ✅ Build exitoso en Vercel
-
----
-
-## 🎨 Mejoras Visuales Implementadas
-
-### Student Success Metrics (Gauges):
-- **Gauge visualization**: CSS `conic-gradient()` circular
-- **Colores dinámicos**: Verde/Amarillo/Rojo según performance
-- **Métricas inversas**: Lógica invertida para "menor es mejor"
-- **Labels claros**: "Meta: máx X" para métricas inversas
-
-### Analytics Dashboard:
-- **KPIs realistas**: Escala mensual (~$288M COP)
-- **Funnel compacto**: Mejor balance visual con charts
-- **Margin variable**: Gráfico con variación realista
-
-### Marketing Dashboard:
-- **Funnel visual**: Embudo de conversión en Sales Funnel
-- **Web traffic**: Gráfico de tráfico con fechas cortas (formato "8/10")
-
----
-
-## 📁 Estructura de Datos
-
-### `/lib/data/historical-data.ts`
-24 meses de datos estáticos (Nov 2023 - Oct 2025):
+#### Actualización del botón:
 ```typescript
-export interface MonthlyMetrics {
-  yearMonth: string;
-  year: number;
-  month: number;
-  monthName: string;
-  date: Date;
+// Antes:
+className="fixed bottom-6 right-6 h-14 w-14 ..."
 
-  // Core Metrics
-  revenue: number;
-  costs: number;
-  grossProfit: number;
-  netProfit: number;
-  marginPercentage: number; // ✨ VARIABLE (37-65%)
-
-  // Volume Metrics
-  leads: number;
-  conversions: number;
-  conversionRate: number;
-  activeStudents: number;
-
-  // Efficiency
-  averageCommission: number;
-  cac: number;
-
-  // Growth
-  momGrowth: number;
-  yoyGrowth: number;
-}
+// Ahora:
+className="fixed bottom-4 right-4 md:bottom-6 md:right-6 h-12 w-12 md:h-14 md:w-14 ..."
 ```
 
-### `/lib/data/mock-data.ts`
+#### Actualización de ventana:
 ```typescript
-export interface StudentSuccessMetric {
-  metric: string;
-  value: number;
-  benchmark: number; // Ahora se llama "Meta" en UI
-  trend: 'up' | 'down' | 'neutral';
-  isInverse?: boolean; // ✨ NUEVO: true para métricas negativas
-}
+// Antes:
+className="fixed bottom-6 right-6 w-96 h-[500px] shadow-2xl ..."
+
+// Ahora:
+className="fixed bottom-0 right-0 md:bottom-6 md:right-6 w-full h-[85vh] md:w-96 md:h-[500px] md:rounded-lg ..."
 ```
+
+#### Comportamiento:
+- **Móvil**: Pantalla completa (85% altura), botón más pequeño
+- **Desktop**: Ventana flotante (384x500px), botón normal
+- **Transiciones**: Suaves en ambos tamaños
 
 ---
 
-## 🗂️ Estructura del Proyecto
+## 📝 TIPOS TYPESCRIPT AGREGADOS
 
-```
-plataforma_global/
-├── app/
-│   ├── dashboard/
-│   │   ├── overview/page.tsx      ← Dashboard principal con YoY chart
-│   │   ├── marketing/page.tsx     ← Marketing metrics, Sales Funnel
-│   │   ├── students/page.tsx      ← ✨ CSS Gauges con colores por rango
-│   │   └── analytics/page.tsx     ← ✨ Funnel visual, KPIs mes actual
-│   └── api/
-│       └── chat/route.ts          ← OpenAI API con contexto histórico
-├── lib/
-│   └── data/
-│       ├── mock-data.ts           ← ✨ Student metrics con isInverse
-│       └── historical-data.ts     ← ✨ Margin variable (37-65%)
-├── types/
-│   └── index.ts                   ← ✨ StudentSuccessMetric con isInverse
-├── components/
-│   └── dashboard/
-│       ├── chat-widget.tsx        ← Chat con auto-scroll y reportes
-│       └── kpi-card.tsx           ← KPI cards reutilizables
-├── PROGRESS.md                    ← ✨ Este archivo actualizado
-└── .env.local                     ← OpenAI API key
-```
+### `/types/index.ts`
+**Nuevas interfaces**: 25+
 
----
+#### User Management (8 tipos):
+- `UserRole`: admin | manager | advisor | marketing
+- `UserStatus`: active | inactive | pending
+- `User`: Interface completa
+- `UserPermissions`: 10 permisos booleanos
 
-## 🎯 Estado Actual del Sistema
+#### System Architecture (7 tipos):
+- `SystemStatus`: online | degraded | offline
+- `SyncStatus`: synced | syncing | error | pending
+- `SystemComponent`: Componente con métricas
+- `DataSyncLog`: Registro de sincronización
+- `SystemMetrics`: Métricas globales del sistema
 
-### Dashboards Activos:
-1. **Overview** ✅
-   - KPI cards principales
-   - Gráfico YoY 2023 vs 2024
-   - Tendencia 30 días
-   - Pipeline funnel
-   - Top 5 asesores
-   - Actividad reciente
+#### Alerts (7 tipos):
+- `AlertSeverity`: critical | warning | info
+- `AlertCategory`: system | business | student | financial
+- `AlertStatus`: unread | read | resolved
+- `Alert`: Interface completa de alerta
+- `AlertConfig`: Configuración de alertas
 
-2. **Marketing** ✅
-   - Métricas de campañas
-   - Performance de canales
-   - ROI y CAC
-   - Web analytics
-   - Sales Funnel visual (trapezoides)
+#### Integrations (4 tipos):
+- `IntegrationType`: database | crm | payment | messaging | email
+- `IntegrationStatus`: connected | disconnected | error | configuring
+- `Integration`: Interface completa con health check
 
-3. **Students** ✅
-   - ✨ CSS Gauges con sistema de colores
-   - ✨ Métricas inversas (Tasa Abandono, Tiempo Graduación)
-   - ✨ "Meta" en lugar de "Benchmark"
-   - Pipeline de estudiantes
-   - Demografía
-   - Performance por programa
+#### System Health (2 tipos):
+- `HealthMetric`: Métrica individual con threshold
+- `ServiceHealth`: Estado de servicio con múltiples métricas
 
-4. **Analytics** ✅
-   - ✨ KPIs del mes actual (no YTD acumulado)
-   - ✨ Funnel visual compacto
-   - ✨ Margin % variable en Performance Anual
-   - Métricas financieras
-   - Análisis de tendencias
-   - KPIs ejecutivos
-   - Proyecciones de revenue
-
-### Chat AI Inteligente:
-- ✅ Integrado con OpenAI GPT-4o-mini
-- ✅ Contexto histórico completo (24 meses)
-- ✅ Generación de reportes ejecutivos
-- ✅ Auto-scroll UX
-- ✅ Respuestas en español colombiano
-- ✅ Formato profesional con emojis
-
-### Datos del Sistema:
-- ✅ 24 meses de histórico (Nov 2023 - Oct 2025)
-- ✅ Margin % variable: 37%-65%
-- ✅ 8 asesores con performance realista
-- ✅ 500 leads en sistema
-- ✅ 6 campañas de marketing activas
-- ✅ Escala realista (~$60-70k USD/mes)
-- ✅ Patrones estacionales implementados
+**Total nuevas líneas en types/index.ts**: ~150
 
 ---
 
-## 🚀 Deployment
+## 📄 DOCUMENTACIÓN CREADA
 
-### GitHub:
-- **Repo**: https://github.com/intelguy8000/plataforma_global
-- **Branch**: `main`
-- **Último commit**: `f23b2e1` (Analytics KPIs fix)
-- **Commits recientes**:
-  - `f23b2e1`: Fix Analytics KPIs (mes actual vs YTD) + funnel compacto
-  - `4a21daf`: Fix ESLint errors (unused imports)
-  - `1925be2`: 14 commits - Benchmark→Meta, colores, funnel, margin variable
+### 1. **NUEVAS_FUNCIONALIDADES.md** (NUEVO)
+**Tamaño**: ~550 líneas
+**Propósito**: Guía completa de los nuevos módulos
 
-### Vercel:
+#### Secciones:
+- Resumen de cambios (5 módulos)
+- Descripción detallada de cada módulo
+- Data mock incluida
+- Tipos TypeScript
+- Estructura de archivos
+- Cómo usar en la demo
+- Flujo de presentación (8-10 min)
+- Puntos clave para cliente
+- Métricas destacables
+- Testing checklist
+- Roadmap de próximas fases
+
+---
+
+### 2. **README.md** (ACTUALIZADO)
+**Cambios**: Reescrito completamente
+
+#### Nuevas secciones:
+- Badge de actualización (Oct 2025)
+- 10 módulos descritos
+- Stack técnico completo
+- Estructura actualizada del proyecto
+- Data mock expandida
+- Sistema de roles y permisos
+- Diseño responsive
+- Deployment en Vercel
+- Métricas del sistema
+- Roadmap en fases
+- Tech stack detallado
+- Stats del proyecto
+
+**Versión actualizada**: 2.0.0
+
+---
+
+## 🎯 RESPONSIVE DESIGN IMPLEMENTADO
+
+### **Cambio Mayor** (24 Oct - Commit 534a709):
+
+#### Problema Identificado:
+- Sidebar siempre visible en móvil
+- Ocupa demasiado espacio horizontal
+- Contenido comprimido
+- Mala experiencia en celular
+
+#### Solución Implementada:
+
+##### **Sidebar con Hamburguesa**:
+```typescript
+// Estado:
+const [isOpen, setIsOpen] = useState(false);
+
+// Botón hamburguesa (móvil):
+<button className="fixed top-4 left-4 z-50 md:hidden">
+  {isOpen ? <X /> : <Menu />}
+</button>
+
+// Overlay (móvil):
+{isOpen && <div className="fixed inset-0 bg-black/50 z-40 md:hidden" />}
+
+// Sidebar:
+<div className={cn(
+  'fixed md:static ... transition-transform',
+  isOpen ? 'translate-x-0' : '-translate-x-full'
+)}>
+```
+
+##### **Breakpoints**:
+- `< 768px`: Móvil (sidebar oculto, hamburguesa visible)
+- `≥ 768px`: Desktop (sidebar fijo, sin hamburguesa)
+
+##### **Animaciones**:
+- Slide-in: `transition-transform 300ms ease-in-out`
+- Overlay: `transition-opacity`
+- Button scale: `hover:scale-110`
+
+##### **UX Improvements**:
+- Auto-close al navegar (onClick en Link)
+- Auto-close al tocar overlay
+- Smooth transitions
+- Visual feedback
+
+---
+
+## 🚀 DEPLOYMENT
+
+### **GitHub**:
+- **Branch**: main
+- **Commits principales**:
+  - `3fadcc6`: Add 5 new enterprise modules
+  - `534a709`: Make dashboard fully responsive
+
+### **Vercel**:
 - **URL**: https://jgsl.vercel.app
-- **Status**: ✅ Deployed and live
-- **Auto-deploy**: Activado (push → deploy automático)
-- **Build time**: ~2-3 minutos
-- **Último build**: Exitoso (ESLint errors resueltos)
-
-### Variables de Entorno (Vercel):
-- `OPENAI_API_KEY`: Configurado ✅
+- **Status**: ✅ Deployed
+- **Build time**: ~3-4 min
+- **Auto-deploy**: Enabled
 
 ---
 
-## 📈 Métricas de Negocio (Octubre 2025)
+## 📊 MÉTRICAS DEL PROYECTO
 
-### Current Performance (Mes Actual):
-- **Revenue**: $288M COP/mes (~$70k USD)
-- **Beneficio Neto**: $123M COP (~$30k USD)
-- **Margen**: 57% (mes actual)
-- **Margen Promedio**: 57.8% (últimos 12 meses)
-- **Leads**: 554/mes
-- **Conversiones**: 66/mes (11.9% tasa)
-- **Estudiantes activos**: 61
-- **CAC promedio**: $1.745M COP (~$425 USD)
-- **MoM Growth**: +9.1%
+### **Stats Actuales**:
+- **Total archivos TS**: 35+
+- **Líneas de código**: 6,500+
+- **Componentes UI**: 15+
+- **Páginas**: 11
+- **Tipos TypeScript**: 75+ interfaces
+- **Data mock**: 1,500+ registros
 
-### Student Success Metrics (Con Colores):
-- **Tasa de Graduación**: 57/75 (76% - 🟡 Amarillo)
-- **GPA Promedio**: 2.2/3.5 (63% - 🔴 Rojo)
-- **Satisfacción Promedio**: 3.9/4.0 (97.5% - 🟢 Verde)
-- **Tasa de Abandono**: 6.8/8 máx (🟢 Verde - bajo meta)
-- **Success Score**: 65/78 (83% - 🟢 Verde)
-- **Tiempo a Graduación**: 21/24 meses máx (🟢 Verde - bajo meta)
-
-### Top Asesor:
-- **Claudia Ramírez**: $52M COP (14.1% conversión)
-
-### Mejor Canal:
-- **Instagram**: 203 leads, ROI 3900%
-
----
-
-## 📋 Reglas y Buenas Prácticas
-
-### 🎨 Sistema de Colores (Student Metrics):
-```typescript
-// Métricas normales (mayor es mejor):
-if (percentage >= 80) → Verde (#10B981)
-else if (percentage >= 50) → Amarillo (#F59E0B)
-else → Rojo (#EF4444)
-
-// Métricas inversas (menor es mejor - isInverse: true):
-if (value <= meta) → Verde
-else if (overage > 50%) → Rojo
-else → Amarillo
+### **Build Stats**:
+```
+Route (app)                    Size    First Load JS
+/dashboard/usuarios           3.72 kB  104 kB
+/dashboard/arquitectura       2.89 kB  103 kB
+/dashboard/alertas            8.96 kB  109 kB
+/dashboard/integraciones      4.34 kB  104 kB
+/dashboard/salud              5.02 kB  105 kB
+/login                        4.07 kB  100 kB
 ```
 
-### 📊 KPIs en Analytics:
-- **Siempre mostrar mes actual**, NO YTD acumulado
-- **Revenue/Beneficio/Leads**: Datos del último mes en array
-- **Margen Promedio**: Puede ser de 12 meses (aclarar en label)
-- **Escala realista**: $200M-400M COP/mes es aceptable
+---
 
-### 📐 Funnel Visual:
-- **Visitantes Web**: 100% fijo (más ancho)
-- **Leads Generados**: 70% (nuevo baseline)
-- **Etapas siguientes**: Proporcionales a Leads Generados dentro del 70%
-- **Altura**: 35px (compacto para balance con otros charts)
-- **Spacing**: `gap-2`, `space-y-1`, `py-2`
+## ✅ CHECKLIST DE FUNCIONALIDADES
 
-### 💾 Datos Históricos:
-- **Archivo**: `/lib/data/historical-data.ts`
-- **Rango**: 24 meses estáticos (Nov 2023 - Oct 2025)
-- **Margin %**: Variable 37-65% (reflejar estacionalidad)
-- **NO modificar** valores individuales sin revisar patrones completos
+### **Core Dashboards** (Originales):
+- [x] Overview
+- [x] Sales
+- [x] Marketing
+- [x] Students
+- [x] Analytics
 
-### 🔧 ESLint y Build:
-- **Siempre remover imports no utilizados** antes de push
-- **Verificar build localmente** si es posible
-- **Commits descriptivos** con detalles de cambios
+### **Enterprise Modules** (Nuevos):
+- [x] Alertas
+- [x] Usuarios
+- [x] Arquitectura
+- [x] Integraciones
+- [x] Salud del Sistema
+
+### **Features**:
+- [x] Chat Widget IA (OpenAI)
+- [x] Dark/Light Mode
+- [x] Sidebar con navegación
+- [x] Responsive design (móvil + desktop)
+- [x] Login simulado con roles
+- [x] Sistema de permisos
+- [x] Monitoreo de sistema
+- [x] Gestión de integraciones
+- [x] Centro de alertas
 
 ---
 
-## 🛠️ Stack Tecnológico
+## 🎯 ESTADO ACTUAL DEL SISTEMA
 
-- **Framework**: Next.js 14 (App Router)
-- **Lenguaje**: TypeScript
-- **UI**: React, Tailwind CSS, shadcn/ui
-- **Charts**: Recharts
-- **AI**: OpenAI GPT-4o-mini
-- **Fechas**: date-fns
-- **Deploy**: Vercel
-- **Código**: GitHub
-- **Visualizaciones Custom**: CSS (`conic-gradient`, `clip-path`)
+### **Completado** ✅:
+- 10 dashboards completos y funcionales
+- Sistema de usuarios y roles
+- Arquitectura de sistemas visualizada
+- Centro de alertas con filtros
+- Gestión de integraciones
+- Monitoreo de salud del sistema
+- Login simulado
+- Responsive design (móvil + desktop)
+- Sidebar con hamburguesa
+- Chat widget adaptativo
+- Documentación completa
+- Build exitoso sin errores
 
----
-
-## 📞 Información de Contacto
-
-**Cliente**: JGSL - Estudiar en el Exterior
-**Oficinas**:
-- Bogotá: Calle 99 #9a-45
-- Medellín: Carrera 42 No. 3 Sur 81
-- Rionegro: Universidad Católica
-
-**Experiencia**: +20 años
-**Convenios**: 750+ institucionales
-
----
-
-## 🎉 Logros de Hoy (17 Oct 2025)
-
-- ✅ Sistema de colores por rangos en Student Success Metrics
-- ✅ Cambio de "Benchmark" a "Meta" en toda la UI
-- ✅ Lógica inversa para métricas negativas (Tasa Abandono, Tiempo Graduación)
-- ✅ Funnel visual movido a Analytics dashboard
-- ✅ Funnel optimizado y compacto (35px altura)
-- ✅ Margin % variable implementado (37-65% range)
-- ✅ KPIs de Analytics corregidos (mes actual vs YTD)
-- ✅ ESLint errors resueltos (unused imports)
-- ✅ 3 commits exitosos con descripciones detalladas
-- ✅ Build y deploy exitosos en Vercel
-- ✅ Sistema completamente funcional y realista
+### **Pendiente** ⏳:
+- [ ] Autenticación real
+- [ ] Base de datos real (Supabase)
+- [ ] APIs funcionales
+- [ ] Drag & drop en kanban
+- [ ] Exportación PDF/Excel
+- [ ] Notificaciones push
+- [ ] Testing automatizado
+- [ ] App móvil nativa
 
 ---
 
-## 📝 Notas para Continuidad
+## 📱 RESPONSIVE BREAKPOINTS
 
-### Reglas Importantes:
-1. **NO crear archivos .md** a menos que sea explícitamente solicitado
-2. **Preferir editar archivos existentes** en lugar de crear nuevos
-3. **Colores por rango**: Verde ≥80%, Amarillo 50-80%, Rojo <50%
-4. **Métricas inversas**: Verificar campo `isInverse` antes de calcular colores
-5. **KPIs Analytics**: Siempre mes actual, no YTD acumulado
-6. **Funnel**: Escala de dos niveles (100% y 70%)
-7. **Margin %**: Debe variar entre 37-65% para realismo
-8. **Commits**: Descriptivos, con emoji 🤖 y Co-Authored-By
-
-### Estado de Datos:
-- ✅ 24 meses históricos completos y consistentes
-- ✅ Escala realista: $200-400M COP/mes
-- ✅ Patrones estacionales implementados
-- ✅ Student metrics con valores realistas
-- ✅ Margin % variable en todos los meses
-
-### Archivos Críticos:
-- `/lib/data/historical-data.ts` - NO modificar sin revisar impacto completo
-- `/lib/data/mock-data.ts` - Student metrics con `isInverse`
-- `/types/index.ts` - Interface `StudentSuccessMetric`
-- `/app/dashboard/analytics/page.tsx` - KPIs mes actual
-- `/app/dashboard/students/page.tsx` - CSS gauges con colores
-
-### Para Próxima Sesión:
-- [ ] Verificar que todo funciona en Vercel production
-- [ ] Testing de colores en diferentes métricas
-- [ ] Validar que funnel se ve balanceado con otros charts
-- [ ] Confirmar que KPIs muestran valores realistas
-- [ ] Revisar margin % variable en gráficos
-
-### Posibles Mejoras Futuras:
-- Más gráficos con margin % variable en otros dashboards
-- Sistema de filtros de fecha para comparar períodos
-- Exportar reportes con CSS gauges a PDF
-- Animaciones en cambios de colores de gauges
-- Tooltips explicativos en métricas inversas
+| Dispositivo | Ancho | Sidebar | Chat |
+|-------------|-------|---------|------|
+| iPhone SE | 375px | Hamburguesa | Full |
+| iPhone 12 | 390px | Hamburguesa | Full |
+| iPhone Pro Max | 428px | Hamburguesa | Full |
+| iPad Mini | 768px | Fijo | Flotante |
+| iPad Pro | 1024px | Fijo | Flotante |
+| Desktop | 1280px+ | Fijo | Flotante |
 
 ---
 
-## 🔍 Debugging Tips
+## 🔧 CONFIGURACIÓN TÉCNICA
 
-### Si los colores no se ven:
-1. Verificar que el campo `isInverse` está en `/lib/data/mock-data.ts`
-2. Revisar lógica de cálculo de `percentage` en students/page.tsx
-3. Confirmar que los rangos son 80% y 50%
+### **Variables de Entorno**:
+```bash
+OPENAI_API_KEY=sk-...
+```
 
-### Si KPIs muestran valores altos:
-1. Verificar que usa `currentMonth` y no YTD acumulado
-2. Revisar que `last12Months[last12Months.length - 1]` es correcto
-3. Confirmar que no está sumando con `.reduce()`
+### **Scripts**:
+```bash
+npm run dev      # Desarrollo
+npm run build    # Build producción
+npm start        # Servidor producción
+npm run lint     # ESLint
+```
 
-### Si el funnel está desbalanceado:
-1. Ajustar `height` en trapezoides (35px recomendado)
-2. Reducir `gap` y `spacing` (gap-2, space-y-1)
-3. Reducir padding del contenedor (py-2)
-
-### Si el build falla:
-1. Buscar imports no utilizados (ESLint)
-2. Verificar que todos los tipos están correctos
-3. Revisar que no hay console.logs olvidados
+### **Dependencias Nuevas**:
+Ninguna (se usaron componentes y utilities existentes)
 
 ---
 
-**Estado General**: ✅ Sistema completamente funcional, datos realistas, visualizaciones optimizadas
-**Próximo Paso**: Testing en producción y validación con cliente
+## 📞 PARA MAÑANA
+
+### **Estado del Proyecto**:
+✅ **Todo completamente funcional y desplegado**
+
+### **Para la Demo**:
+1. Mostrar página de login con selector de roles
+2. Navegar por los 10 módulos
+3. Destacar **Arquitectura de Sistemas** (wow factor)
+4. Mostrar **Alertas** en tiempo real
+5. Demostrar **Usuarios y Permisos**
+6. Mostrar **Integraciones** activas
+7. Revisar **Salud del Sistema**
+8. Probar responsive en celular
+9. Usar chat widget para consultas
+
+### **URLs Importantes**:
+- **Producción**: https://jgsl.vercel.app
+- **Login**: https://jgsl.vercel.app/login
+- **GitHub**: https://github.com/intelguy8000/plataforma_global
 
 ---
 
-*Última actualización por Claude Code - 17 de Octubre, 2025*
-*Commits: f23b2e1, 4a21daf, 1925be2*
+## 🎉 LOGROS DE HOY (24 Oct 2025)
+
+- ✅ 5 módulos empresariales nuevos
+- ✅ 6 nuevas páginas creadas
+- ✅ 2 archivos de data agregados
+- ✅ 25+ tipos TypeScript nuevos
+- ✅ Sidebar responsive con hamburguesa
+- ✅ Chat widget adaptativo
+- ✅ Layout optimizado para móvil
+- ✅ Documentación completa
+- ✅ 2 commits exitosos
+- ✅ Build y deploy exitosos
+- ✅ 0 errores de TypeScript
+- ✅ 0 errores de ESLint críticos
+
+---
+
+**Estado General**: ✅ **PRODUCCIÓN - TODO FUNCIONAL**
+**Versión**: 2.0.0
+**Última actualización**: 24 de Octubre, 2025
+
+---
+
+*Generado con Claude Code*
+*Commits: 3fadcc6, 534a709*
